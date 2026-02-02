@@ -1,1 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FlowerShop Каталог</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fff9fb 0%, #f8f9fa 100%);
+            padding: 16px;
+            color: #333;
+            max-width: 500px;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #f8d7da;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #e83e8c;
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .bouquet {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .bouquet img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: transform 0.3s;
+        }
+        
+        .bouquet img:hover {
+            transform: scale(1.02);
+        }
+        
+        .bouquet h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .bouquet p {
+            color: #7f8c8d;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 16px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 16px 0 12px 0;
+            color: #2c3e50;
+        }
+        
+        .color-palette {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .color-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+        }
+        
+        .color-btn.active {
+            border-color: #333;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+        }
+        
+        .add-ons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .add-on {
+            background: #f8f9fa;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .add-on:hover {
+            background: #e9ecef;
+        }
+        
+        .add-on.active {
+            background: linear-gradient(135deg, #e83e8c, #9b59b6);
+            color: white;
+            border-color: #e83e8c;
+        }
+        
+        .delivery {
+            margin-bottom: 16px;
+        }
+        
+        .delivery-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .delivery-option:hover {
+            background: #e9ecef;
+        }
+        
+        .delivery-option.active {
+            border: 2px solid #e83e8c;
+            background: #fff0f5;
+        }
+        
+        .delivery-option input {
+            display: none;
+        }
+        
+        .delivery-option label {
+            margin-left: 10px;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .delivery-option .price-tag {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .promo-code {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .promo-code input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+        }
+        
+        .promo-code input:focus {
+            outline: none;
+            border-color: #e83e8c;
+            box-shadow: 0 0 0 2px rgba(232, 62, 140, 0.2);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #e83e8c, #9b59b6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(232, 62, 140, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(232, 62, 140, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .basket {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px;
+            border-top: 2px solid #f8d7da;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .basket-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .basket-total span {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .basket-total strong {
+            font-size: 24px;
+            color: #e74c3c;
+        }
+        
+        .order-summary {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            color: #555;
+        }
+        
+        .order-item:last-child {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #e83e8c;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+        
+        .toast.error {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💐 Каталог букетов</h1>
+        <p>Выберите букет и настройте под свой вкус</p>
+    </div>
+    
+    <div class="bouquet">
+        <img src="https://i.imgur.com/placeholder1.jpg" alt="Романтический букет" id="bouquet-img">
+        <h3>Романтический букет</h3>
+        <p>Розы, лилии, эустома в нежных тонах. Идеальный подарок для любимого человека.</p>
+        <div class="price" id="base-price">₽ 3 500</div>
+        
+        <div class="section-title">🎨 Выберите цвет:</div>
+        <div class="color-palette">
+            <div class="color-btn active" style="background: #e83e8c;" data-color="#e83e8c" data-img="https://i.imgur.com/placeholder1.jpg"></div>
+            <div class="color-btn" style="background: #3498db;" data-color="#3498db" data-img="https://i.imgur.com/placeholder2.jpg"></div>
+            <div class="color-btn" style="background: #2ecc71;" data-color="#2ecc71" data-img="https://i.imgur.com/placeholder3.jpg"></div>
+            <div class="color-btn" style="background: #f39c12;" data-color="#f39c12" data-img="https://i.imgur.com/placeholder4.jpg"></div>
+            <div class="color-btn" style="background: #9b59b6;" data-color="#9b59b6" data-img="https://i.imgur.com/placeholder5.jpg"></div>
+            <div class="color-btn" style="background: #e74c3c;" data-color="#e74c3c" data-img="https://i.imgur.com/placeholder6.jpg"></div>
+            <div class="color-btn" style="background: #1abc9c;" data-color="#1abc9c" data-img="https://i.imgur.com/placeholder7.jpg"></div>
+            <div class="color-btn" style="background: #f1c40f;" data-color="#f1c40f" data-img="https://i.imgur.com/placeholder8.jpg"></div>
+            <div class="color-btn" style="background: #95a5a6;" data-color="#95a5a6" data-img="https://i.imgur.com/placeholder9.jpg"></div>
+            <div class="color-btn" style="background: #d35400;" data-color="#d35400" data-img="https://i.imgur.com/placeholder10.jpg"></div>
+        </div>
+        
+        <div class="section-title">🎁 Дополнения:</div>
+        <div class="add-ons">
+            <div class="add-on" data-price="1000">🧸 Мишка (+1000₽)</div>
+            <div class="add-on" data-price="300">🍬 Конфеты (+300₽)</div>
+            <div class="add-on" data-price="500">🍫 Шоколад (+500₽)</div>
+        </div>
+        
+        <div class="section-title">🚚 Доставка:</div>
+        <div class="delivery">
+            <div class="delivery-option active" data-type="center" data-price="1500">
+                <input type="radio" name="delivery" value="center" checked>
+                <label>Центр Москвы <span class="price-tag">(1500 ₽)</span></label>
+            </div>
+            <div class="delivery-option" data-type="mkad" data-price="2000">
+                <input type="radio" name="delivery" value="mkad">
+                <label>До МКАД <span class="price-tag">(2000 ₽)</span></label>
+            </div>
+            <div class="delivery-option" data-type="beyond_mkad" data-price="0">
+                <input type="radio" name="delivery" value="beyond_mkad">
+                <label>За МКАД <span class="price-tag">(индивидуально)</span></label>
+            </div>
+            <div class="delivery-option" data-type="self" data-price="0">
+                <input type="radio" name="delivery" value="self">
+                <label>Самовывоз <span class="price-tag">(бесплатно)</span></label>
+            </div>
+        </div>
+        
+        <div class="section-title">🏷 Промокод:</div>
+        <div class="promo-code">
+            <input type="text" placeholder="Введите промокод" id="promo-code">
+        </div>
+        
+        <button class="btn" onclick="addToCart()">Добавить в корзину</button>
+    </div>
+    
+    <div class="basket">
+        <div class="basket-total">
+            <span>Итого:</span>
+            <strong id="total-price">₽ 5 000</strong>
+        </div>
+        <div class="order-summary" id="order-summary">
+            <div class="order-item">
+                <span>Букет:</span>
+                <span>Романтический</span>
+            </div>
+            <div class="order-item">
+                <span>Цвет:</span>
+                <span>Розовый</span>
+            </div>
+            <div class="order-item">
+                <span>Итого:</span>
+                <span>₽ 5 000</span>
+            </div>
+        </div>
+        <button class="btn" onclick="checkout()">Оформить заказ</button>
+    </div>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+        
+        // Настройки букета
+        let selectedColor = '#e83e8c';
+        let selectedAddOns = [];
+        let selectedDelivery = 'center';
+        let deliveryPrice = 1500;
+        let promoCode = '';
+        let basePrice = 3500;
+        
+        // Смена цвета
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedColor = this.getAttribute('data-color');
+                
+                const imgSrc = this.getAttribute('data-img');
+                document.getElementById('bouquet-img').src = imgSrc;
+            });
+        });
+        
+        // Выбор доп.услуг
+        document.querySelectorAll('.add-on').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const price = parseInt(this.getAttribute('data-price'));
+                const index = selectedAddOns.indexOf(price);
+                
+                if (index === -1) {
+                    selectedAddOns.push(price);
+                } else {
+                    selectedAddOns.splice(index, 1);
+                }
+                
+                updateTotal();
+            });
+        });
+        
+        // Выбор доставки
+        document.querySelectorAll('.delivery-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.delivery-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                selectedDelivery = this.getAttribute('data-type');
+                deliveryPrice = parseInt(this.getAttribute('data-price'));
+                updateTotal();
+            });
+        });
+        
+        // Промокод
+        document.getElementById('promo-code').addEventListener('input', function() {
+            promoCode = this.value.trim();
+            updateTotal();
+        });
+        
+        // Обновление итоговой цены
+        function updateTotal() {
+            let total = basePrice;
+            selectedAddOns.forEach(price => total += price);
+            total += deliveryPrice;
+            
+            let discount = 0;
+            if (promoCode.toLowerCase() === 'flower2024') {
+                discount = total * 0.1;
+                document.getElementById('promo-code').style.backgroundColor = '#d4edda';
+                document.getElementById('promo-code').style.borderColor = '#28a745';
+            } else if (promoCode.toLowerCase() === 'newyear') {
+                discount = total * 0.15;
+                document.getElementById('promo-code').style.backgroundColor = '#d4edda';
+                document.getElementById('promo-code').style.borderColor = '#28a745';
+            } else {
+                document.getElementById('promo-code').style.backgroundColor = 'white';
+                document.getElementById('promo-code').style.borderColor = '#ced4da';
+            }
+            
+            total = Math.max(0, total - discount);
+            
+            document.getElementById('total-price').textContent = `₽ ${total.toLocaleString('ru-RU')}`;
+            
+            const summary = document.getElementById('order-summary');
+            let summaryHTML = `
+                <div class="order-item">
+                    <span>Букет:</span>
+                    <span>Романтический</span>
+                </div>
+                <div class="order-item">
+                    <span>Цвет:</span>
+                    <span>${getColorName(selectedColor)}</span>
+                </div>
+            `;
+            
+            selectedAddOns.forEach(price => {
+                summaryHTML += `
+                    <div class="order-item">
+                        <span>Доп.услуга:</span>
+                        <span>${getAddOnName(price)} (+${price.toLocaleString('ru-RU')} ₽)</span>
+                    </div>
+                `;
+            });
+            
+            summaryHTML += `
+                <div class="order-item">
+                    <span>Доставка:</span>
+                    <span>${getDeliveryName(selectedDelivery)}</span>
+                </div>
+            `;
+            
+            if (discount > 0) {
+                summaryHTML += `
+                    <div class="order-item">
+                        <span>Скидка:</span>
+                        <span>-${discount.toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                `;
+            }
+            
+            summaryHTML += `
+                <div class="order-item">
+                    <span><strong>Итого:</strong></span>
+                    <span><strong>₽ ${total.toLocaleString('ru-RU')}</strong></span>
+                </div>
+            `;
+            
+            summary.innerHTML = summaryHTML;
+        }
+        
+        function getColorName(color) {
+            const colors = {
+                '#e83e8c': 'Розовый',
+                '#3498db': 'Голубой',
+                '#2ecc71': 'Зелёный',
+                '#f39c12': 'Оранжевый',
+                '#9b59b6': 'Фиолетовый',
+                '#e74c3c': 'Красный',
+                '#1abc9c': 'Бирюзовый',
+                '#f1c40f': 'Жёлтый',
+                '#95a5a6': 'Серый',
+                '#d35400': 'Коричневый'
+            };
+            return colors[color] || 'Неизвестный';
+        }
+        
+        function getAddOnName(price) {
+            const addOns = {
+                1000: '🧸 Мишка',
+                300: '🍬 Конфеты',
+                500: '🍫 Шоколад'
+            };
+            return addOns[price] || 'Неизвестная услуга';
+        }
+        
+        function getDeliveryName(type) {
+            const delivery = {
+                'self': 'Самовывоз (бесплатно)',
+                'center': 'Центр Москвы (1500 ₽)',
+                'mkad': 'До МКАД (2000 ₽)',
+                'beyond_mkad': 'За МКАД (индивидуально)'
+            };
+            return delivery[type] || 'Неизвестная доставка';
+        }
+        
+        function addToCart() {
+            showNotification('✅ Букет добавлен в корзину!', 'success');
+            updateTotal();
+        }
+        
+        function showNotification(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + (type === 'error' ? 'error' : '');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        function checkout() {
+            const addOnsArray = selectedAddOns.map(price => getAddOnName(price) + ' (+'+price+'₽)');
+            
+            const orderData = {
+                bouquet: 'romantic',
+                color: selectedColor,
+                add_ons: addOnsArray,
+                total_price: parseInt(document.getElementById('total-price').textContent.replace(/\D/g, '')),
+                promo_code: promoCode,
+                delivery_type: selectedDelivery,
+                delivery_price: deliveryPrice
+            };
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner"></div> Отправка...';
+            
+            try {
+                window.Telegram.WebApp.sendData(JSON.stringify(orderData));
+                
+                setTimeout(() => {
+                    window.Telegram.WebApp.close();
+                }, 500);
+                
+            } catch (error) {
+                console.error('Ошибка отправки:', error);
+                showNotification('❌ Ошибка отправки заказа', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Оформить заказ';
+            }
+        }
+        
+        updateTotal();
+    </script>
+</body>
+</html>
