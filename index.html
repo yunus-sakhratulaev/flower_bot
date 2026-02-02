@@ -428,8 +428,8 @@
     <script>
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Расширить на всю высоту
-        tg.ready();  // Говорим боту, что приложение готово
+        tg.expand();
+        tg.ready();
         
         // Настройки букета
         let selectedColor = '#e83e8c';
@@ -446,7 +446,6 @@
                 this.classList.add('active');
                 selectedColor = this.getAttribute('data-color');
                 
-                // Меняем фото букета
                 const imgSrc = this.getAttribute('data-img');
                 document.getElementById('bouquet-img').src = imgSrc;
             });
@@ -492,14 +491,13 @@
             selectedAddOns.forEach(price => total += price);
             total += deliveryPrice;
             
-            // Применение промокода (пример: 10% скидка)
             let discount = 0;
             if (promoCode.toLowerCase() === 'flower2024') {
-                discount = total * 0.1; // 10%
+                discount = total * 0.1;
                 document.getElementById('promo-code').style.backgroundColor = '#d4edda';
                 document.getElementById('promo-code').style.borderColor = '#28a745';
             } else if (promoCode.toLowerCase() === 'newyear') {
-                discount = total * 0.15; // 15%
+                discount = total * 0.15;
                 document.getElementById('promo-code').style.backgroundColor = '#d4edda';
                 document.getElementById('promo-code').style.borderColor = '#28a745';
             } else {
@@ -511,7 +509,6 @@
             
             document.getElementById('total-price').textContent = `₽ ${total.toLocaleString('ru-RU')}`;
             
-            // Обновление деталей заказа
             const summary = document.getElementById('order-summary');
             let summaryHTML = `
                 <div class="order-item">
@@ -559,7 +556,6 @@
             summary.innerHTML = summaryHTML;
         }
         
-        // Помощники для отображения
         function getColorName(color) {
             const colors = {
                 '#e83e8c': 'Розовый',
@@ -595,13 +591,11 @@
             return delivery[type] || 'Неизвестная доставка';
         }
         
-        // Добавить в корзину
         function addToCart() {
             showNotification('✅ Букет добавлен в корзину!', 'success');
             updateTotal();
         }
         
-        // Показать уведомление
         function showNotification(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = 'toast ' + (type === 'error' ? 'error' : '');
@@ -613,9 +607,7 @@
             }, 3000);
         }
         
-        // Оформить заказ
         function checkout() {
-            // Подготавливаем данные в формате, который ожидает бот
             const addOnsArray = selectedAddOns.map(price => getAddOnName(price) + ' (+'+price+'₽)');
             
             const orderData = {
@@ -628,29 +620,25 @@
                 delivery_price: deliveryPrice
             };
             
-            // Показываем лоадер
             const btn = event.target;
             btn.disabled = true;
             btn.innerHTML = '<div class="loading-spinner"></div> Отправка...';
             
-            // Отправляем данные в бот (КРИТИЧЕСКИ ВАЖНО: правильный способ!)
             try {
                 window.Telegram.WebApp.sendData(JSON.stringify(orderData));
                 
-                // Закрываем мини-приложение
                 setTimeout(() => {
                     window.Telegram.WebApp.close();
                 }, 500);
                 
             } catch (error) {
-                console.error('Ошибка отправки данных:', error);
+                console.error('Ошибка отправки:', error);
                 showNotification('❌ Ошибка отправки заказа', 'error');
                 btn.disabled = false;
                 btn.textContent = 'Оформить заказ';
             }
         }
         
-        // Инициализация
         updateTotal();
     </script>
 </body>
