@@ -2,253 +2,190 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FlowerShop Каталог</title>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>FlowerShop</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }
-    body { background: #fff9fb; padding:16px; color:#333; max-width:520px; margin:0 auto; }
-    .header { text-align:center; padding:16px 0; border-bottom:2px solid #f8d7da; margin-bottom:16px; }
-    .header h1 { color:#e83e8c; font-size:22px; margin-bottom:6px; }
-    .header p { color:#6c757d; font-size:14px; }
-    .bouquet { background:#fff; border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.08); margin-bottom:110px; }
-    .bouquet img { width:100%; height:220px; object-fit:cover; border-radius:10px; margin-bottom:12px; }
-    .price { font-size:22px; font-weight:800; color:#e74c3c; margin:12px 0; }
-    .section-title { font-size:15px; font-weight:700; margin:14px 0 10px; }
-    .color-palette { display:flex; gap:8px; flex-wrap:wrap; }
-    .color-btn { width:34px; height:34px; border-radius:50%; border:2px solid #ddd; cursor:pointer; }
-    .color-btn.active { border-color:#333; box-shadow:0 0 0 2px #fff, 0 0 0 4px #333; }
-    .add-ons { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
-    .add-on { flex:1; min-width:110px; text-align:center; padding:10px 12px; border-radius:10px; border:1px solid #eee; background:#f8f9fa; cursor:pointer; font-size:13px; }
-    .add-on.active { background:linear-gradient(135deg,#e83e8c,#9b59b6); color:#fff; border-color:#e83e8c; }
-    .delivery-option { display:flex; align-items:center; padding:12px; border-radius:10px; background:#f8f9fa; border:2px solid transparent; margin-bottom:8px; cursor:pointer; }
-    .delivery-option.active { border-color:#e83e8c; background:#fff0f5; }
-    .delivery-option input { display:none; }
-    .delivery-option label { margin-left:8px; flex:1; font-size:14px; }
-    .price-tag { font-weight:800; color:#e74c3c; }
-    .promo-code input { width:100%; padding:12px; border-radius:10px; border:1px solid #ced4da; font-size:14px; }
-    .btn { width:100%; padding:14px; border:none; border-radius:12px; color:#fff; font-weight:800; font-size:16px; cursor:pointer;
-      background:linear-gradient(135deg,#e83e8c,#9b59b6); box-shadow:0 4px 12px rgba(232,62,140,.25); }
-    .btn:disabled { opacity:.6; cursor:not-allowed; box-shadow:none; }
-    .basket { position:fixed; left:0; right:0; bottom:0; background:#fff; padding:14px 16px; border-top:2px solid #f8d7da; box-shadow:0 -2px 12px rgba(0,0,0,.08); }
-    .basket-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-    .basket-total strong { font-size:20px; color:#e74c3c; }
-    .order-summary { font-size:13px; color:#555; }
-    .order-item { display:flex; justify-content:space-between; margin:6px 0; }
-    .toast { position:fixed; top:18px; left:50%; transform:translateX(-50%); background:#28a745; color:#fff; padding:10px 16px; border-radius:10px; z-index:9999; }
-    .toast.error { background:#dc3545; }
+    body { font-family: Arial, sans-serif; padding: 16px; background:#fafafa; }
+    .card { background:#fff; border:1px solid #eee; border-radius:12px; padding:16px; margin-bottom:12px; }
+    .btn { width:100%; padding:14px; border:none; border-radius:10px; background:#e83e8c; color:#fff; font-weight:700; font-size:16px; }
+    .btn:disabled { opacity:.6 }
+    .row { display:flex; gap:8px; flex-wrap:wrap; }
+    .pill { padding:10px 12px; border:1px solid #ddd; border-radius:999px; cursor:pointer; background:#fff; }
+    .pill.active { border-color:#e83e8c; background:#fff0f6; }
+    input { width:100%; padding:12px; border:1px solid #ddd; border-radius:10px; }
+    .small { color:#666; font-size:12px; margin-top:8px; }
+    code { background:#f2f2f2; padding:2px 6px; border-radius:6px; }
   </style>
 </head>
-
 <body>
-  <div class="header">
-    <h1>💐 Каталог букетов</h1>
-    <p>Выберите цвет, дополнения и доставку</p>
-  </div>
+  <div class="card" id="dbg"></div>
 
-  <div class="bouquet">
-    <img src="https://i.imgur.com/7Z1kZ4l.jpg" alt="Букет" id="bouquet-img">
-    <h3>Романтический букет</h3>
-    <p>Розы, лилии, эустома в нежных тонах.</p>
-    <div class="price" id="base-price">₽ 3 500</div>
+  <div class="card">
+    <h3>💐 Романтический букет</h3>
+    <p>Базовая цена: <b id="basePrice">3500</b> ₽</p>
 
-    <div class="section-title">🎨 Выберите цвет:</div>
-    <div class="color-palette">
-      <div class="color-btn active" style="background:#e83e8c" data-color="#e83e8c"></div>
-      <div class="color-btn" style="background:#3498db" data-color="#3498db"></div>
-      <div class="color-btn" style="background:#2ecc71" data-color="#2ecc71"></div>
-      <div class="color-btn" style="background:#f39c12" data-color="#f39c12"></div>
-      <div class="color-btn" style="background:#9b59b6" data-color="#9b59b6"></div>
-    </div>
+    <p><b>Цвет:</b></p>
+    <div class="row" id="colors"></div>
 
-    <div class="section-title">🎁 Дополнения:</div>
-    <div class="add-ons">
-      <div class="add-on" data-price="1000">🧸 Мишка (+1000₽)</div>
-      <div class="add-on" data-price="300">🍬 Конфеты (+300₽)</div>
-      <div class="add-on" data-price="500">🍫 Шоколад (+500₽)</div>
-    </div>
+    <p style="margin-top:12px;"><b>Дополнения:</b></p>
+    <div class="row" id="addons"></div>
 
-    <div class="section-title">🚚 Доставка:</div>
-    <div class="delivery">
-      <div class="delivery-option active" data-type="center" data-price="1500">
-        <input type="radio" name="delivery" value="center" checked>
-        <label>Центр Москвы <span class="price-tag">(1500 ₽)</span></label>
-      </div>
-      <div class="delivery-option" data-type="mkad" data-price="2000">
-        <input type="radio" name="delivery" value="mkad">
-        <label>До МКАД <span class="price-tag">(2000 ₽)</span></label>
-      </div>
-      <div class="delivery-option" data-type="self" data-price="0">
-        <input type="radio" name="delivery" value="self">
-        <label>Самовывоз <span class="price-tag">(бесплатно)</span></label>
-      </div>
-    </div>
+    <p style="margin-top:12px;"><b>Доставка:</b></p>
+    <div class="row" id="delivery"></div>
 
-    <div class="section-title">🏷 Промокод:</div>
-    <div class="promo-code">
-      <input type="text" placeholder="Введите промокод" id="promo-code">
-    </div>
+    <p style="margin-top:12px;"><b>Промокод:</b></p>
+    <input id="promo" placeholder="например: flower2024" />
 
-    <button class="btn" id="btn-add">Добавить в корзину</button>
-  </div>
+    <p style="margin-top:12px;"><b>Итого:</b> <span id="total">5000</span> ₽</p>
 
-  <div class="basket">
-    <div class="basket-total">
-      <span>Итого:</span>
-      <strong id="total-price">₽ 5 000</strong>
-    </div>
-    <div class="order-summary" id="order-summary"></div>
-    <button class="btn" id="btn-checkout">Оформить заказ</button>
+    <button class="btn" id="sendBtn">Оформить заказ</button>
+    <div class="small">Важно: отправка работает только внутри Telegram Mini App.</div>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.ready();
+    const tg = window.Telegram?.WebApp;
 
-    let selectedColor = '#e83e8c';
-    let selectedAddOns = [];
-    let selectedDelivery = 'center';
+    // ====== DEBUG PANEL ======
+    const dbg = document.getElementById("dbg");
+    const initDataLen = (tg?.initData || "").length;
+    dbg.innerHTML = `
+      <b>Debug</b><br>
+      WebApp: <code>${!!tg}</code><br>
+      initData length: <code>${initDataLen}</code><br>
+      Если initData length = 0 — ты открыл сайт НЕ через Telegram MiniApp.
+    `;
+
+    if (tg) {
+      tg.expand();
+      tg.ready();
+    }
+
+    // ====== DATA ======
+    const basePrice = 3500;
+    let selectedColor = "#e83e8c";
+    let selectedAddons = [];
+    let deliveryType = "center";
     let deliveryPrice = 1500;
-    let promoCode = '';
-    let basePrice = 3500;
 
-    function showToast(text, type='success') {
-      const t = document.createElement('div');
-      t.className = 'toast' + (type === 'error' ? ' error' : '');
-      t.textContent = text;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2500);
+    const colorList = [
+      ["Розовый", "#e83e8c"],
+      ["Голубой", "#3498db"],
+      ["Зелёный", "#2ecc71"],
+      ["Оранжевый", "#f39c12"]
+    ];
+
+    const addonList = [
+      ["🧸 Мишка", 1000],
+      ["🍬 Конфеты", 300],
+      ["🍫 Шоколад", 500]
+    ];
+
+    const deliveryList = [
+      ["Центр", "center", 1500],
+      ["До МКАД", "mkad", 2000],
+      ["Самовывоз", "self", 0],
+      ["За МКАД", "beyond_mkad", 0]
+    ];
+
+    // ====== RENDER ======
+    const colorsEl = document.getElementById("colors");
+    const addonsEl = document.getElementById("addons");
+    const deliveryEl = document.getElementById("delivery");
+    const promoEl = document.getElementById("promo");
+    const totalEl = document.getElementById("total");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function pill(text, onClick) {
+      const el = document.createElement("div");
+      el.className = "pill";
+      el.textContent = text;
+      el.addEventListener("click", onClick);
+      return el;
     }
 
-    function getColorName(color) {
-      const colors = {
-        '#e83e8c': 'Розовый',
-        '#3498db': 'Голубой',
-        '#2ecc71': 'Зелёный',
-        '#f39c12': 'Оранжевый',
-        '#9b59b6': 'Фиолетовый'
-      };
-      return colors[color] || 'Неизвестный';
-    }
+    function render() {
+      colorsEl.innerHTML = "";
+      colorList.forEach(([name, hex]) => {
+        const el = pill(name, () => {
+          selectedColor = hex;
+          render();
+        });
+        if (selectedColor === hex) el.classList.add("active");
+        colorsEl.appendChild(el);
+      });
 
-    function getAddOnName(price) {
-      const addOns = { 1000:'🧸 Мишка', 300:'🍬 Конфеты', 500:'🍫 Шоколад' };
-      return addOns[price] || 'Дополнение';
-    }
+      addonsEl.innerHTML = "";
+      addonList.forEach(([name, price]) => {
+        const key = `${name} (+${price}₽)`;
+        const el = pill(key, () => {
+          const idx = selectedAddons.findIndex(x => x.name === name);
+          if (idx === -1) selectedAddons.push({ name, price });
+          else selectedAddons.splice(idx, 1);
+          render();
+        });
+        if (selectedAddons.some(x => x.name === name)) el.classList.add("active");
+        addonsEl.appendChild(el);
+      });
 
-    function getDeliveryName(type) {
-      const delivery = {
-        'self':'Самовывоз (бесплатно)',
-        'center':'Центр Москвы (1500 ₽)',
-        'mkad':'До МКАД (2000 ₽)'
-      };
-      return delivery[type] || 'Доставка';
+      deliveryEl.innerHTML = "";
+      deliveryList.forEach(([label, type, price]) => {
+        const el = pill(`${label} (${price}₽)`, () => {
+          deliveryType = type;
+          deliveryPrice = price;
+          render();
+        });
+        if (deliveryType === type) el.classList.add("active");
+        deliveryEl.appendChild(el);
+      });
+
+      updateTotal();
     }
 
     function updateTotal() {
-      let total = basePrice;
-      selectedAddOns.forEach(p => total += p);
-      total += deliveryPrice;
-
-      let discount = 0;
-      if (promoCode.toLowerCase() === 'flower2024') discount = total * 0.10;
-      total = Math.max(0, total - discount);
-
-      document.getElementById('total-price').textContent = `₽ ${total.toLocaleString('ru-RU')}`;
-
-      let html = `
-        <div class="order-item"><span>Букет:</span><span>Романтический</span></div>
-        <div class="order-item"><span>Цвет:</span><span>${getColorName(selectedColor)}</span></div>
-      `;
-      selectedAddOns.forEach(price => {
-        html += `<div class="order-item"><span>Дополнение:</span><span>${getAddOnName(price)} (+${price}₽)</span></div>`;
-      });
-      html += `<div class="order-item"><span>Доставка:</span><span>${getDeliveryName(selectedDelivery)}</span></div>`;
-      if (discount > 0) html += `<div class="order-item"><span>Скидка:</span><span>-${discount.toLocaleString('ru-RU')} ₽</span></div>`;
-      html += `<div class="order-item"><span><b>Итого:</b></span><span><b>₽ ${total.toLocaleString('ru-RU')}</b></span></div>`;
-      document.getElementById('order-summary').innerHTML = html;
+      let total = basePrice + deliveryPrice + selectedAddons.reduce((s, x) => s + x.price, 0);
+      const promo = (promoEl.value || "").trim().toLowerCase();
+      if (promo === "flower2024") total = Math.round(total * 0.9);
+      if (promo === "newyear") total = Math.round(total * 0.85);
+      totalEl.textContent = total;
     }
 
-    // Цвет
-    document.querySelectorAll('.color-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedColor = btn.dataset.color;
-        updateTotal();
-      });
-    });
+    promoEl.addEventListener("input", updateTotal);
 
-    // Допы
-    document.querySelectorAll('.add-on').forEach(btn => {
-      btn.addEventListener('click', () => {
-        btn.classList.toggle('active');
-        const price = parseInt(btn.dataset.price, 10);
-        const idx = selectedAddOns.indexOf(price);
-        if (idx === -1) selectedAddOns.push(price);
-        else selectedAddOns.splice(idx, 1);
-        updateTotal();
-      });
-    });
-
-    // Доставка
-    document.querySelectorAll('.delivery-option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        document.querySelectorAll('.delivery-option').forEach(o => o.classList.remove('active'));
-        opt.classList.add('active');
-        selectedDelivery = opt.dataset.type;
-        deliveryPrice = parseInt(opt.dataset.price, 10);
-        updateTotal();
-      });
-    });
-
-    // Промокод
-    document.getElementById('promo-code').addEventListener('input', (e) => {
-      promoCode = e.target.value.trim();
-      updateTotal();
-    });
-
-    document.getElementById('btn-add').addEventListener('click', () => {
-      showToast('✅ Добавлено в корзину');
-      updateTotal();
-    });
-
-    // ✅ ОТПРАВКА В БОТА
-    document.getElementById('btn-checkout').addEventListener('click', () => {
-      const btn = document.getElementById('btn-checkout');
-      btn.disabled = true;
-
-      const addOnsArray = selectedAddOns.map(price => `${getAddOnName(price)} (+${price}₽)`);
-
-      const totalNumber = Number(String(document.getElementById('total-price').textContent).replace(/\D/g, ""));
-
+    // ====== SEND ======
+    sendBtn.addEventListener("click", () => {
+      const promo = (promoEl.value || "").trim();
       const orderData = {
         bouquet: "romantic",
         color: selectedColor,
-        add_ons: addOnsArray,
-        total_price: totalNumber,
-        promo_code: promoCode,
-        delivery_type: selectedDelivery,
+        add_ons: selectedAddons.map(x => `${x.name} (+${x.price}₽)`),
+        total_price: Number(totalEl.textContent || 0),
+        promo_code: promo,
+        delivery_type: deliveryType,
         delivery_price: deliveryPrice
       };
 
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Отправка…";
+
       try {
+        if (!tg) {
+          alert("Открой сайт внутри Telegram Mini App. Сейчас tg = null");
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Оформить заказ";
+          return;
+        }
+
         tg.sendData(JSON.stringify(orderData));
-        showToast("✅ Заказ отправлен в бот");
-
-        // ✅ не закрываем мгновенно (иначе иногда апдейт не долетает)
-        setTimeout(() => tg.close(), 1200);
-
+        setTimeout(() => tg.close(), 600);
       } catch (e) {
-        console.error(e);
-        showToast("❌ Ошибка отправки", "error");
-        btn.disabled = false;
+        alert("sendData error: " + e);
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Оформить заказ";
       }
     });
 
-    updateTotal();
+    render();
   </script>
 </body>
 </html>
