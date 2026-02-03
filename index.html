@@ -2,189 +2,253 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>FlowerShop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FlowerShop Каталог</title>
+
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif}
-    body{max-width:520px;margin:0 auto;padding:16px;background:linear-gradient(135deg,#fff9fb 0%,#f8f9fa 100%);padding-bottom:140px}
-    .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.08);margin-bottom:16px}
-    .title{font-size:22px;font-weight:800;color:#e83e8c;text-align:center;margin:8px 0 2px}
-    .sub{color:#6c757d;text-align:center;margin-bottom:12px;font-size:13px}
-    img{width:100%;height:220px;object-fit:cover;border-radius:10px;margin-bottom:12px}
-    .h3{font-size:18px;font-weight:700;margin-bottom:6px;color:#2c3e50}
-    .p{color:#7f8c8d;font-size:14px;line-height:1.5;margin-bottom:10px}
-    .price{font-size:22px;font-weight:800;color:#e74c3c;margin:10px 0 14px}
-    .section{font-weight:700;margin:12px 0 10px;color:#2c3e50}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .color{width:34px;height:34px;border-radius:50%;border:2px solid #ddd;cursor:pointer}
-    .color.active{border-color:#333;box-shadow:0 0 0 2px #fff,0 0 0 4px #333}
-    .chip{flex:1;min-width:110px;text-align:center;background:#f8f9fa;border:1px solid #e9ecef;border-radius:10px;padding:10px;cursor:pointer;font-size:13px}
-    .chip.active{background:linear-gradient(135deg,#e83e8c,#9b59b6);color:#fff;border-color:#e83e8c}
-    .opt{display:flex;align-items:center;gap:10px;background:#f8f9fa;border-radius:10px;padding:12px;border:2px solid transparent;cursor:pointer;margin-bottom:8px}
-    .opt.active{border-color:#e83e8c;background:#fff0f5}
-    .tag{font-weight:800;color:#e74c3c}
-    input{width:100%;padding:12px;border:1px solid #ced4da;border-radius:10px}
-    .basket{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid #f8d7da;box-shadow:0 -2px 10px rgba(0,0,0,.08);padding:14px}
-    .total{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .total strong{font-size:24px;color:#e74c3c}
-    .btn{width:100%;border:none;border-radius:12px;padding:16px;background:linear-gradient(135deg,#e83e8c,#9b59b6);color:#fff;font-size:16px;font-weight:800;cursor:pointer}
-    .btn:disabled{background:#adb5bd;cursor:not-allowed}
-    .toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#28a745;color:#fff;padding:10px 18px;border-radius:10px;z-index:9999}
-    .toast.error{background:#dc3545}
-    .spin{display:inline-block;width:18px;height:18px;border-radius:50%;border:3px solid #f3f3f3;border-top:3px solid #fff;vertical-align:middle;margin-right:8px;animation:s 1s linear infinite}
-    @keyframes s{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    * { margin:0; padding:0; box-sizing:border-box; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }
+    body { background: #fff9fb; padding:16px; color:#333; max-width:520px; margin:0 auto; }
+    .header { text-align:center; padding:16px 0; border-bottom:2px solid #f8d7da; margin-bottom:16px; }
+    .header h1 { color:#e83e8c; font-size:22px; margin-bottom:6px; }
+    .header p { color:#6c757d; font-size:14px; }
+    .bouquet { background:#fff; border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,.08); margin-bottom:110px; }
+    .bouquet img { width:100%; height:220px; object-fit:cover; border-radius:10px; margin-bottom:12px; }
+    .price { font-size:22px; font-weight:800; color:#e74c3c; margin:12px 0; }
+    .section-title { font-size:15px; font-weight:700; margin:14px 0 10px; }
+    .color-palette { display:flex; gap:8px; flex-wrap:wrap; }
+    .color-btn { width:34px; height:34px; border-radius:50%; border:2px solid #ddd; cursor:pointer; }
+    .color-btn.active { border-color:#333; box-shadow:0 0 0 2px #fff, 0 0 0 4px #333; }
+    .add-ons { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+    .add-on { flex:1; min-width:110px; text-align:center; padding:10px 12px; border-radius:10px; border:1px solid #eee; background:#f8f9fa; cursor:pointer; font-size:13px; }
+    .add-on.active { background:linear-gradient(135deg,#e83e8c,#9b59b6); color:#fff; border-color:#e83e8c; }
+    .delivery-option { display:flex; align-items:center; padding:12px; border-radius:10px; background:#f8f9fa; border:2px solid transparent; margin-bottom:8px; cursor:pointer; }
+    .delivery-option.active { border-color:#e83e8c; background:#fff0f5; }
+    .delivery-option input { display:none; }
+    .delivery-option label { margin-left:8px; flex:1; font-size:14px; }
+    .price-tag { font-weight:800; color:#e74c3c; }
+    .promo-code input { width:100%; padding:12px; border-radius:10px; border:1px solid #ced4da; font-size:14px; }
+    .btn { width:100%; padding:14px; border:none; border-radius:12px; color:#fff; font-weight:800; font-size:16px; cursor:pointer;
+      background:linear-gradient(135deg,#e83e8c,#9b59b6); box-shadow:0 4px 12px rgba(232,62,140,.25); }
+    .btn:disabled { opacity:.6; cursor:not-allowed; box-shadow:none; }
+    .basket { position:fixed; left:0; right:0; bottom:0; background:#fff; padding:14px 16px; border-top:2px solid #f8d7da; box-shadow:0 -2px 12px rgba(0,0,0,.08); }
+    .basket-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .basket-total strong { font-size:20px; color:#e74c3c; }
+    .order-summary { font-size:13px; color:#555; }
+    .order-item { display:flex; justify-content:space-between; margin:6px 0; }
+    .toast { position:fixed; top:18px; left:50%; transform:translateX(-50%); background:#28a745; color:#fff; padding:10px 16px; border-radius:10px; z-index:9999; }
+    .toast.error { background:#dc3545; }
   </style>
 </head>
-<body>
 
-  <div class="card">
-    <div class="title">💐 Каталог букетов</div>
-    <div class="sub">Открой из Telegram — и отправь заказ боту</div>
+<body>
+  <div class="header">
+    <h1>💐 Каталог букетов</h1>
+    <p>Выберите цвет, дополнения и доставку</p>
   </div>
 
-  <div class="card">
-    <img id="img" src="https://i.imgur.com/7Z1kZ4l.jpg" alt="Букет"/>
-    <div class="h3">Романтический букет</div>
-    <div class="p">Розы, лилии, эустома в нежных тонах. Идеальный подарок.</div>
-    <div class="price">₽ <span id="basePrice">3500</span></div>
+  <div class="bouquet">
+    <img src="https://i.imgur.com/7Z1kZ4l.jpg" alt="Букет" id="bouquet-img">
+    <h3>Романтический букет</h3>
+    <p>Розы, лилии, эустома в нежных тонах.</p>
+    <div class="price" id="base-price">₽ 3 500</div>
 
-    <div class="section">🎨 Цвет</div>
-    <div class="row" id="colors">
-      <div class="color active" style="background:#e83e8c" data-color="#e83e8c"></div>
-      <div class="color" style="background:#3498db" data-color="#3498db"></div>
-      <div class="color" style="background:#2ecc71" data-color="#2ecc71"></div>
-      <div class="color" style="background:#f39c12" data-color="#f39c12"></div>
+    <div class="section-title">🎨 Выберите цвет:</div>
+    <div class="color-palette">
+      <div class="color-btn active" style="background:#e83e8c" data-color="#e83e8c"></div>
+      <div class="color-btn" style="background:#3498db" data-color="#3498db"></div>
+      <div class="color-btn" style="background:#2ecc71" data-color="#2ecc71"></div>
+      <div class="color-btn" style="background:#f39c12" data-color="#f39c12"></div>
+      <div class="color-btn" style="background:#9b59b6" data-color="#9b59b6"></div>
     </div>
 
-    <div class="section">🎁 Дополнения</div>
-    <div class="row" id="addons">
-      <div class="chip" data-name="🧸 Мишка" data-price="1000">🧸 Мишка (+1000₽)</div>
-      <div class="chip" data-name="🍬 Конфеты" data-price="300">🍬 Конфеты (+300₽)</div>
-      <div class="chip" data-name="🍫 Шоколад" data-price="500">🍫 Шоколад (+500₽)</div>
+    <div class="section-title">🎁 Дополнения:</div>
+    <div class="add-ons">
+      <div class="add-on" data-price="1000">🧸 Мишка (+1000₽)</div>
+      <div class="add-on" data-price="300">🍬 Конфеты (+300₽)</div>
+      <div class="add-on" data-price="500">🍫 Шоколад (+500₽)</div>
     </div>
 
-    <div class="section">🚚 Доставка</div>
-    <div id="delivery">
-      <div class="opt active" data-type="center" data-price="1500">Центр Москвы <span class="tag">(1500₽)</span></div>
-      <div class="opt" data-type="mkad" data-price="2000">До МКАД <span class="tag">(2000₽)</span></div>
-      <div class="opt" data-type="self" data-price="0">Самовывоз <span class="tag">(0₽)</span></div>
+    <div class="section-title">🚚 Доставка:</div>
+    <div class="delivery">
+      <div class="delivery-option active" data-type="center" data-price="1500">
+        <input type="radio" name="delivery" value="center" checked>
+        <label>Центр Москвы <span class="price-tag">(1500 ₽)</span></label>
+      </div>
+      <div class="delivery-option" data-type="mkad" data-price="2000">
+        <input type="radio" name="delivery" value="mkad">
+        <label>До МКАД <span class="price-tag">(2000 ₽)</span></label>
+      </div>
+      <div class="delivery-option" data-type="self" data-price="0">
+        <input type="radio" name="delivery" value="self">
+        <label>Самовывоз <span class="price-tag">(бесплатно)</span></label>
+      </div>
     </div>
 
-    <div class="section">🏷 Промокод</div>
-    <input id="promo" placeholder="Например: flower2024" />
+    <div class="section-title">🏷 Промокод:</div>
+    <div class="promo-code">
+      <input type="text" placeholder="Введите промокод" id="promo-code">
+    </div>
+
+    <button class="btn" id="btn-add">Добавить в корзину</button>
   </div>
 
   <div class="basket">
-    <div class="total">
+    <div class="basket-total">
       <span>Итого:</span>
-      <strong>₽ <span id="total">5000</span></strong>
+      <strong id="total-price">₽ 5 000</strong>
     </div>
-    <button class="btn" id="btn" onclick="checkout()">Оформить заказ</button>
+    <div class="order-summary" id="order-summary"></div>
+    <button class="btn" id="btn-checkout">Оформить заказ</button>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) { tg.ready(); tg.expand(); }
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
 
-    const basePrice = 3500;
-
-    let selectedColor = "#e83e8c";
-    let selectedDelivery = "center";
+    let selectedColor = '#e83e8c';
+    let selectedAddOns = [];
+    let selectedDelivery = 'center';
     let deliveryPrice = 1500;
-    let promoCode = "";
-    let addOns = []; // {name, price}
+    let promoCode = '';
+    let basePrice = 3500;
 
-    function toast(msg, isErr=false){
-      const t = document.createElement("div");
-      t.className = "toast" + (isErr ? " error" : "");
-      t.textContent = msg;
+    function showToast(text, type='success') {
+      const t = document.createElement('div');
+      t.className = 'toast' + (type === 'error' ? ' error' : '');
+      t.textContent = text;
       document.body.appendChild(t);
-      setTimeout(()=>t.remove(), 2200);
+      setTimeout(() => t.remove(), 2500);
     }
 
-    function calcTotal(){
-      let total = basePrice + deliveryPrice + addOns.reduce((s,a)=>s+a.price,0);
+    function getColorName(color) {
+      const colors = {
+        '#e83e8c': 'Розовый',
+        '#3498db': 'Голубой',
+        '#2ecc71': 'Зелёный',
+        '#f39c12': 'Оранжевый',
+        '#9b59b6': 'Фиолетовый'
+      };
+      return colors[color] || 'Неизвестный';
+    }
+
+    function getAddOnName(price) {
+      const addOns = { 1000:'🧸 Мишка', 300:'🍬 Конфеты', 500:'🍫 Шоколад' };
+      return addOns[price] || 'Дополнение';
+    }
+
+    function getDeliveryName(type) {
+      const delivery = {
+        'self':'Самовывоз (бесплатно)',
+        'center':'Центр Москвы (1500 ₽)',
+        'mkad':'До МКАД (2000 ₽)'
+      };
+      return delivery[type] || 'Доставка';
+    }
+
+    function updateTotal() {
+      let total = basePrice;
+      selectedAddOns.forEach(p => total += p);
+      total += deliveryPrice;
+
       let discount = 0;
-      const p = promoCode.toLowerCase();
-      if (p === "flower2024") discount = total * 0.10;
-      if (p === "newyear") discount = total * 0.15;
-      total = Math.max(0, Math.round(total - discount));
-      document.getElementById("total").textContent = total;
-      return total;
+      if (promoCode.toLowerCase() === 'flower2024') discount = total * 0.10;
+      total = Math.max(0, total - discount);
+
+      document.getElementById('total-price').textContent = `₽ ${total.toLocaleString('ru-RU')}`;
+
+      let html = `
+        <div class="order-item"><span>Букет:</span><span>Романтический</span></div>
+        <div class="order-item"><span>Цвет:</span><span>${getColorName(selectedColor)}</span></div>
+      `;
+      selectedAddOns.forEach(price => {
+        html += `<div class="order-item"><span>Дополнение:</span><span>${getAddOnName(price)} (+${price}₽)</span></div>`;
+      });
+      html += `<div class="order-item"><span>Доставка:</span><span>${getDeliveryName(selectedDelivery)}</span></div>`;
+      if (discount > 0) html += `<div class="order-item"><span>Скидка:</span><span>-${discount.toLocaleString('ru-RU')} ₽</span></div>`;
+      html += `<div class="order-item"><span><b>Итого:</b></span><span><b>₽ ${total.toLocaleString('ru-RU')}</b></span></div>`;
+      document.getElementById('order-summary').innerHTML = html;
     }
 
-    document.getElementById("colors").addEventListener("click", (e)=>{
-      const el = e.target.closest(".color");
-      if(!el) return;
-      document.querySelectorAll(".color").forEach(x=>x.classList.remove("active"));
-      el.classList.add("active");
-      selectedColor = el.dataset.color;
-      calcTotal();
+    // Цвет
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedColor = btn.dataset.color;
+        updateTotal();
+      });
     });
 
-    document.getElementById("addons").addEventListener("click", (e)=>{
-      const el = e.target.closest(".chip");
-      if(!el) return;
-      el.classList.toggle("active");
-      const name = el.dataset.name;
-      const price = parseInt(el.dataset.price,10);
-
-      const idx = addOns.findIndex(x=>x.name===name && x.price===price);
-      if(idx === -1) addOns.push({name, price});
-      else addOns.splice(idx,1);
-
-      calcTotal();
+    // Допы
+    document.querySelectorAll('.add-on').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        const price = parseInt(btn.dataset.price, 10);
+        const idx = selectedAddOns.indexOf(price);
+        if (idx === -1) selectedAddOns.push(price);
+        else selectedAddOns.splice(idx, 1);
+        updateTotal();
+      });
     });
 
-    document.getElementById("delivery").addEventListener("click", (e)=>{
-      const el = e.target.closest(".opt");
-      if(!el) return;
-      document.querySelectorAll(".opt").forEach(x=>x.classList.remove("active"));
-      el.classList.add("active");
-      selectedDelivery = el.dataset.type;
-      deliveryPrice = parseInt(el.dataset.price,10);
-      calcTotal();
+    // Доставка
+    document.querySelectorAll('.delivery-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.delivery-option').forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+        selectedDelivery = opt.dataset.type;
+        deliveryPrice = parseInt(opt.dataset.price, 10);
+        updateTotal();
+      });
     });
 
-    document.getElementById("promo").addEventListener("input", (e)=>{
-      promoCode = (e.target.value || "").trim();
-      calcTotal();
+    // Промокод
+    document.getElementById('promo-code').addEventListener('input', (e) => {
+      promoCode = e.target.value.trim();
+      updateTotal();
     });
 
-    function checkout(){
-      const btn = document.getElementById("btn");
+    document.getElementById('btn-add').addEventListener('click', () => {
+      showToast('✅ Добавлено в корзину');
+      updateTotal();
+    });
+
+    // ✅ ОТПРАВКА В БОТА
+    document.getElementById('btn-checkout').addEventListener('click', () => {
+      const btn = document.getElementById('btn-checkout');
       btn.disabled = true;
-      btn.innerHTML = '<span class="spin"></span>Отправка...';
 
-      try{
-        if(!tg) throw new Error("Открой страницу из Telegram (Telegram.WebApp недоступен в обычном браузере).");
+      const addOnsArray = selectedAddOns.map(price => `${getAddOnName(price)} (+${price}₽)`);
 
-        const total = calcTotal();
+      const totalNumber = Number(String(document.getElementById('total-price').textContent).replace(/\D/g, ""));
 
-        const payload = {
-          bouquet: "romantic",
-          color: selectedColor,
-          add_ons: addOns.map(a => `${a.name} (+${a.price}₽)`),
-          total_price: total,
-          promo_code: promoCode,
-          delivery_type: selectedDelivery,
-          delivery_price: deliveryPrice
-        };
+      const orderData = {
+        bouquet: "romantic",
+        color: selectedColor,
+        add_ons: addOnsArray,
+        total_price: totalNumber,
+        promo_code: promoCode,
+        delivery_type: selectedDelivery,
+        delivery_price: deliveryPrice
+      };
 
-        tg.sendData(JSON.stringify(payload));
-        setTimeout(()=>tg.close(), 700);
-      }catch(err){
-        console.error(err);
-        toast("❌ " + err.message, true);
+      try {
+        tg.sendData(JSON.stringify(orderData));
+        showToast("✅ Заказ отправлен в бот");
+
+        // ✅ не закрываем мгновенно (иначе иногда апдейт не долетает)
+        setTimeout(() => tg.close(), 1200);
+
+      } catch (e) {
+        console.error(e);
+        showToast("❌ Ошибка отправки", "error");
         btn.disabled = false;
-        btn.textContent = "Оформить заказ";
       }
-    }
+    });
 
-    // init
-    document.getElementById("basePrice").textContent = basePrice;
-    calcTotal();
+    updateTotal();
   </script>
 </body>
 </html>
