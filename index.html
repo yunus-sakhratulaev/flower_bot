@@ -1,99 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MiniApp Test</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini App Test</title>
 
-  <!-- Telegram Mini App SDK -->
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 20px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.1);
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 16px;
-      border-radius: 10px;
-      border: none;
-      background: #4caf50;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .info {
-      font-size: 14px;
-      margin-bottom: 12px;
-      color: #333;
-    }
-    .debug {
-      font-size: 12px;
-      color: #777;
-      margin-top: 10px;
-      word-break: break-all;
-    }
+    body { font-family: Arial, sans-serif; padding: 16px; }
+    button { padding: 12px 16px; font-size: 16px; cursor: pointer; }
+    textarea { width: 100%; height: 120px; margin-top: 12px; font-size: 14px; }
+    .row { margin-top: 12px; }
+    .status { margin-top: 12px; white-space: pre-wrap; }
   </style>
 </head>
-<body>
 
-<div class="card">
-  <div class="info">
-    🧪 Тестовая Mini App<br>
-    Нажми кнопку — данные уйдут боту через <code>sendData</code>
+<body>
+  <h2>Mini App → Bot → Group</h2>
+
+  <div class="row">
+    <button id="sendBtn">Отправить в группу</button>
   </div>
 
-  <button onclick="sendOrder()">Отправить заказ</button>
+  <div class="row">
+    <textarea id="text" placeholder="Текст сообщения (можно оставить пустым)"></textarea>
+  </div>
 
-  <div class="debug" id="debug"></div>
-</div>
+  <div class="status" id="status"></div>
 
-<script>
-  const tg = window.Telegram.WebApp;
+  <script>
+    // ✅ ВСТАВЬ сюда твой Railway домен
+    const API_URL = "https://tg-miniapp-backend-production.up.railway.app";
+    // ✅ Твой API_KEY (который положил в Railway Variables)
+    const API_KEY = "lfdfq";
 
-  tg.expand();
-  tg.ready();
+    const statusEl = document.getElementById("status");
+    const textEl = document.getElementById("text");
 
-  // Покажем, что мы реально внутри Telegram
-  document.getElementById("debug").innerText =
-    "WebApp: " + (!!tg) +
-    "\ninitData length: " + (tg.initData ? tg.initData.length : 0);
-
-  function sendOrder() {
-    const orderData = {
-      bouquet: "romantic",
-      color: "pink",
-      add_ons: ["Мишка", "Шоколад"],
-      total_price: 5000,
-      promo_code: "TEST",
-      delivery_type: "center",
-      delivery_price: 1500
-    };
-
-    try {
-      tg.sendData(JSON.stringify(orderData));
-
-      document.getElementById("debug").innerText +=
-        "\n\nsendData() вызван ✔";
-
-      // даём Telegram отправить апдейт
-      setTimeout(() => tg.close(), 800);
-    } catch (e) {
-      document.getElementById("debug").innerText +=
-        "\n\nsendData ERROR: " + e;
+    function log(msg) {
+      statusEl.textContent = msg;
     }
-  }
-</script>
 
+    // Telegram WebApp (если открыто внутри Telegram)
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    function buildMessage() {
+      const customText = (textEl.value || "").trim();
+
+      // Если пользователь ввёл текст — используем его
+      if (customText) return customText;
+
+      // Если открыто из Telegram — берём данные юзера
+      const user = tg?.initDataUnsafe?.user;
+      if (user) {
+        const name = [user.first_name, user.last_name].filter(Boolean).join(" ");
+        return `✅ Тест из mini-app\n👤 ${name}\n🆔 ${user.id}`;
+      }
+
+      // Если открыто просто в браузере
+      return "✅ Тест из mini-app (открыто не из Telegram)";
+    }
+
+    async function sendToGroup() {
+      try {
+        log("Отправляю...");
+
+        const text = buildMessage();
+
+        const r = await fetch(`${API_URL}/api/send`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": API_KEY
+          },
+          body: JSON.stringify({ text })
+        });
+
+        const data = await r.json().catch(() => ({}));
+
+        if (!r.ok) {
+          log("Ошибка:\n" + JSON.stringify(data, null, 2));
+          return;
+        }
+
+        log("Отправлено ✅\n" + JSON.stringify(data, null, 2));
+
+        // Если в Telegram — можно показать уведомление
+        if (tg) tg.showAlert("Отправлено в группу ✅");
+
+      } catch (e) {
+        log("Ошибка сети:\n" + String(e));
+      }
+    }
+
+    document.getElementById("sendBtn").addEventListener("click", sendToGroup);
+  </script>
 </body>
 </html>
