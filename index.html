@@ -14,7 +14,6 @@
       --muted:#64748b;
       --line:#e5e7eb;
       --green:#22c55e;
-      --blue:#111827;
       --badge:#facc15;
       --shadow: 0 10px 25px rgba(15,23,42,.08);
       --radius: 18px;
@@ -28,7 +27,7 @@
       display:flex;align-items:center;justify-content:space-between;
       padding:0 18px; position:sticky; top:0; z-index:10;
     }
-    .brand{display:flex;gap:10px;align-items:center;font-weight:800;font-size:20px}
+    .brand{display:flex;gap:10px;align-items:center;font-weight:800;font-size:20px;cursor:pointer}
     .brand .ico{font-size:22px}
     .rightIcons{display:flex;align-items:center;gap:14px}
     .cartBtn{
@@ -40,7 +39,6 @@
       padding:10px 14px;border-radius:14px;border:0;cursor:pointer;
       background:#111827;color:#fff;font-weight:700;display:flex;gap:8px;align-items:center;
     }
-    .editorBtn .gear{filter:invert(1);}
 
     .container{max-width:1180px;margin:18px auto;padding:0 16px 120px}
     .tabs{
@@ -66,7 +64,7 @@
       overflow:hidden; box-shadow: var(--shadow);
       display:flex;flex-direction:column;min-height: 420px;
     }
-    .imgWrap{position:relative; height:240px; background:#eee; overflow:hidden}
+    .imgWrap{position:relative; height:240px; background:#eee; overflow:hidden; cursor:pointer}
     .imgWrap img{width:100%;height:100%;object-fit:cover;display:block}
     .badge{
       position:absolute; top:12px; right:12px;
@@ -76,7 +74,7 @@
     }
     .badge .star{font-size:14px}
     .cardBody{padding:14px 14px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
-    .title{font-weight:900;font-size:18px;margin:0}
+    .title{font-weight:900;font-size:18px;margin:0;cursor:pointer}
     .desc{margin:0;color:var(--muted);line-height:1.35}
     .bottomRow{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
     .price{font-weight:900;font-size:26px}
@@ -154,7 +152,6 @@
     .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
     .status{margin:12px 0 0;color:#0f172a;white-space:pre-wrap}
 
-    /* Small helpers */
     .backLink{
       display:inline-flex;gap:8px;align-items:center;color:#111827;
       font-weight:900;margin:8px 0 12px;
@@ -171,7 +168,7 @@
     </div>
 
     <div class="rightIcons">
-      <button class="editorBtn" type="button" onclick="alert('Редактор товаров позже подключим')">
+      <button class="editorBtn" type="button" onclick="alert('Редактор товаров подключим позже')">
         ⚙️ Редактор товаров
       </button>
 
@@ -195,19 +192,19 @@
 <script>
   // ========= НАСТРОЙКИ =========
   const API_URL = "https://tg-miniapp-backend-production.up.railway.app";
-  const API_KEY = "my_secret_key_123"; // тот же, что в Railway Variables
-  const VERCEL_ORIGIN = "https://ret-ashy.vercel.app";
+  const API_KEY = "my_secret_key_123";
 
   // ========= Telegram =========
   const tg = window.Telegram?.WebApp;
   if (tg) { tg.ready(); tg.expand(); }
   const user = tg?.initDataUnsafe?.user || null;
+
   const buyerText = user
     ? `Покупатель: ${user.first_name}${user.last_name ? " " + user.last_name : ""} (id ${user.id})`
-    : "Покупатель: Гость";
+    : "Покупатель: Гость (не из Telegram)";
   document.getElementById("buyerLine").textContent = buyerText;
 
-  // ========= ДАННЫЕ КАТАЛОГА (как на твоих скринах) =========
+  // ========= ДАННЫЕ КАТАЛОГА =========
   const PRODUCTS = [
     {
       id: 1,
@@ -256,7 +253,7 @@
   const DELIVERY_SLOTS = ["10:00 - 12:00","12:00 - 14:00","14:00 - 16:00","16:00 - 18:00","18:00 - 20:00"];
 
   // ========= STATE =========
-  const cart = new Map(); // productId -> qty
+  const cart = new Map();     // productId -> qty
   const delivery = new Map(); // productId -> slot
   const app = document.getElementById("app");
   const cartCountEl = document.getElementById("cartCount");
@@ -288,24 +285,16 @@
   }
 
   // ========= ROUTER (/#/product/1) =========
-  function go(path){
-    location.hash = path;
-  }
-
-  function currentRoute(){
-    const h = location.hash.replace("#","") || "/";
-    return h;
-  }
+  function go(path){ location.hash = path; }
+  function currentRoute(){ return location.hash.replace("#","") || "/"; }
 
   function render(){
     const route = currentRoute();
-
     if (route.startsWith("/product/")){
       const id = Number(route.split("/")[2]);
       renderProduct(id);
       return;
     }
-
     renderCatalog();
   }
 
@@ -420,12 +409,9 @@
 
     document.getElementById("back").onclick = ()=>go("/");
 
-    // gallery
     let activeImg = 0;
     const mainImg = document.getElementById("mainImg");
-    function drawMain(){
-      mainImg.innerHTML = `<img src="${p.images[activeImg]}" alt="">`;
-    }
+    function drawMain(){ mainImg.innerHTML = `<img src="${p.images[activeImg]}" alt="">`; }
     const thumbs = document.getElementById("thumbs");
     p.images.forEach((src, idx)=>{
       const t = document.createElement("div");
@@ -441,7 +427,6 @@
     });
     drawMain();
 
-    // slots
     const slots = document.getElementById("slots");
     DELIVERY_SLOTS.forEach(s=>{
       const b = document.createElement("button");
@@ -455,7 +440,6 @@
       slots.appendChild(b);
     });
 
-    // qty
     const qtyVal = document.getElementById("qtyVal");
     document.getElementById("minus").onclick = ()=>{ setQty(id, getQty(id)-1); qtyVal.textContent = getQty(id); };
     document.getElementById("plus").onclick = ()=>{ setQty(id, getQty(id)+1); qtyVal.textContent = getQty(id); };
@@ -469,7 +453,7 @@
     };
   }
 
-  // ========= ORDER =========
+  // ========= ORDER (ВАЖНО: теперь /api/order) =========
   function buildOrderText(){
     const lines = [];
     lines.push("🛒 Новый заказ");
@@ -480,7 +464,7 @@
       lines.push(`🆔 ${user.id}`);
       if (user.username) lines.push(`🔗 @${user.username}`);
     } else {
-      lines.push("👤 Гость");
+      lines.push("👤 Гость (не из Telegram)");
     }
 
     lines.push("");
@@ -503,19 +487,31 @@
   }
 
   async function sendOrder(){
-    if (calcTotals().count === 0) return;
+    const {count} = calcTotals();
+    if (count === 0) return;
+
+    // buyer_id берём из Telegram
+    const buyerId = user?.id || 0;
+    if (!buyerId) {
+      alert("Открой mini-app внутри Telegram, чтобы оформить заказ.");
+      return;
+    }
 
     orderBtn.disabled = true;
-    const text = buildOrderText();
+
+    const orderText = buildOrderText();
 
     try{
-      const r = await fetch(`${API_URL}/api/send`, {
+      const r = await fetch(`${API_URL}/api/order`, {
         method:"POST",
         headers:{
           "Content-Type":"application/json",
           "X-API-Key": API_KEY
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({
+          text: orderText,
+          buyer_id: buyerId
+        })
       });
 
       const data = await r.json().catch(()=> ({}));
@@ -525,7 +521,7 @@
         return;
       }
 
-      // очистка корзины
+      // очищаем корзину
       cart.clear();
       delivery.clear();
       updateCartUI();
@@ -533,7 +529,6 @@
       if (tg) tg.showAlert("Заказ отправлен ✅");
       else alert("Заказ отправлен ✅");
 
-      // вернём на каталог
       go("/");
     } catch(e){
       alert("Сетевая ошибка: " + e);
@@ -545,7 +540,11 @@
 
   // header handlers
   document.getElementById("goHome").onclick = ()=>go("/");
-  document.getElementById("openCart").onclick = ()=>{ if (calcTotals().count===0) alert("Корзина пустая"); else alert(buildOrderText()); };
+  document.getElementById("openCart").onclick = ()=>{
+    const {count} = calcTotals();
+    if (count===0) alert("Корзина пустая");
+    else alert(buildOrderText());
+  };
 
   window.addEventListener("hashchange", render);
   updateCartUI();
