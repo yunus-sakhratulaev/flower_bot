@@ -2,190 +2,98 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>FlowerShop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MiniApp Test</title>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
-    body { font-family: Arial, sans-serif; padding: 16px; background:#fafafa; }
-    .card { background:#fff; border:1px solid #eee; border-radius:12px; padding:16px; margin-bottom:12px; }
-    .btn { width:100%; padding:14px; border:none; border-radius:10px; background:#e83e8c; color:#fff; font-weight:700; font-size:16px; }
-    .btn:disabled { opacity:.6 }
-    .row { display:flex; gap:8px; flex-wrap:wrap; }
-    .pill { padding:10px 12px; border:1px solid #ddd; border-radius:999px; cursor:pointer; background:#fff; }
-    .pill.active { border-color:#e83e8c; background:#fff0f6; }
-    input { width:100%; padding:12px; border:1px solid #ddd; border-radius:10px; }
-    .small { color:#666; font-size:12px; margin-top:8px; }
-    code { background:#f2f2f2; padding:2px 6px; border-radius:6px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 16px;
+      border-radius: 10px;
+      border: none;
+      background: #4caf50;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .info {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+    .debug {
+      font-size: 12px;
+      color: #777;
+      margin-top: 10px;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
-  <div class="card" id="dbg"></div>
 
-  <div class="card">
-    <h3>💐 Романтический букет</h3>
-    <p>Базовая цена: <b id="basePrice">3500</b> ₽</p>
-
-    <p><b>Цвет:</b></p>
-    <div class="row" id="colors"></div>
-
-    <p style="margin-top:12px;"><b>Дополнения:</b></p>
-    <div class="row" id="addons"></div>
-
-    <p style="margin-top:12px;"><b>Доставка:</b></p>
-    <div class="row" id="delivery"></div>
-
-    <p style="margin-top:12px;"><b>Промокод:</b></p>
-    <input id="promo" placeholder="например: flower2024" />
-
-    <p style="margin-top:12px;"><b>Итого:</b> <span id="total">5000</span> ₽</p>
-
-    <button class="btn" id="sendBtn">Оформить заказ</button>
-    <div class="small">Важно: отправка работает только внутри Telegram Mini App.</div>
+<div class="card">
+  <div class="info">
+    🧪 Тестовая Mini App<br>
+    Нажми кнопку — данные уйдут боту через <code>sendData</code>
   </div>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script>
-    const tg = window.Telegram?.WebApp;
+  <button onclick="sendOrder()">Отправить заказ</button>
 
-    // ====== DEBUG PANEL ======
-    const dbg = document.getElementById("dbg");
-    const initDataLen = (tg?.initData || "").length;
-    dbg.innerHTML = `
-      <b>Debug</b><br>
-      WebApp: <code>${!!tg}</code><br>
-      initData length: <code>${initDataLen}</code><br>
-      Если initData length = 0 — ты открыл сайт НЕ через Telegram MiniApp.
-    `;
+  <div class="debug" id="debug"></div>
+</div>
 
-    if (tg) {
-      tg.expand();
-      tg.ready();
+<script>
+  const tg = window.Telegram.WebApp;
+
+  tg.expand();
+  tg.ready();
+
+  // Покажем, что мы реально внутри Telegram
+  document.getElementById("debug").innerText =
+    "WebApp: " + (!!tg) +
+    "\ninitData length: " + (tg.initData ? tg.initData.length : 0);
+
+  function sendOrder() {
+    const orderData = {
+      bouquet: "romantic",
+      color: "pink",
+      add_ons: ["Мишка", "Шоколад"],
+      total_price: 5000,
+      promo_code: "TEST",
+      delivery_type: "center",
+      delivery_price: 1500
+    };
+
+    try {
+      tg.sendData(JSON.stringify(orderData));
+
+      document.getElementById("debug").innerText +=
+        "\n\nsendData() вызван ✔";
+
+      // даём Telegram отправить апдейт
+      setTimeout(() => tg.close(), 800);
+    } catch (e) {
+      document.getElementById("debug").innerText +=
+        "\n\nsendData ERROR: " + e;
     }
+  }
+</script>
 
-    // ====== DATA ======
-    const basePrice = 3500;
-    let selectedColor = "#e83e8c";
-    let selectedAddons = [];
-    let deliveryType = "center";
-    let deliveryPrice = 1500;
-
-    const colorList = [
-      ["Розовый", "#e83e8c"],
-      ["Голубой", "#3498db"],
-      ["Зелёный", "#2ecc71"],
-      ["Оранжевый", "#f39c12"]
-    ];
-
-    const addonList = [
-      ["🧸 Мишка", 1000],
-      ["🍬 Конфеты", 300],
-      ["🍫 Шоколад", 500]
-    ];
-
-    const deliveryList = [
-      ["Центр", "center", 1500],
-      ["До МКАД", "mkad", 2000],
-      ["Самовывоз", "self", 0],
-      ["За МКАД", "beyond_mkad", 0]
-    ];
-
-    // ====== RENDER ======
-    const colorsEl = document.getElementById("colors");
-    const addonsEl = document.getElementById("addons");
-    const deliveryEl = document.getElementById("delivery");
-    const promoEl = document.getElementById("promo");
-    const totalEl = document.getElementById("total");
-    const sendBtn = document.getElementById("sendBtn");
-
-    function pill(text, onClick) {
-      const el = document.createElement("div");
-      el.className = "pill";
-      el.textContent = text;
-      el.addEventListener("click", onClick);
-      return el;
-    }
-
-    function render() {
-      colorsEl.innerHTML = "";
-      colorList.forEach(([name, hex]) => {
-        const el = pill(name, () => {
-          selectedColor = hex;
-          render();
-        });
-        if (selectedColor === hex) el.classList.add("active");
-        colorsEl.appendChild(el);
-      });
-
-      addonsEl.innerHTML = "";
-      addonList.forEach(([name, price]) => {
-        const key = `${name} (+${price}₽)`;
-        const el = pill(key, () => {
-          const idx = selectedAddons.findIndex(x => x.name === name);
-          if (idx === -1) selectedAddons.push({ name, price });
-          else selectedAddons.splice(idx, 1);
-          render();
-        });
-        if (selectedAddons.some(x => x.name === name)) el.classList.add("active");
-        addonsEl.appendChild(el);
-      });
-
-      deliveryEl.innerHTML = "";
-      deliveryList.forEach(([label, type, price]) => {
-        const el = pill(`${label} (${price}₽)`, () => {
-          deliveryType = type;
-          deliveryPrice = price;
-          render();
-        });
-        if (deliveryType === type) el.classList.add("active");
-        deliveryEl.appendChild(el);
-      });
-
-      updateTotal();
-    }
-
-    function updateTotal() {
-      let total = basePrice + deliveryPrice + selectedAddons.reduce((s, x) => s + x.price, 0);
-      const promo = (promoEl.value || "").trim().toLowerCase();
-      if (promo === "flower2024") total = Math.round(total * 0.9);
-      if (promo === "newyear") total = Math.round(total * 0.85);
-      totalEl.textContent = total;
-    }
-
-    promoEl.addEventListener("input", updateTotal);
-
-    // ====== SEND ======
-    sendBtn.addEventListener("click", () => {
-      const promo = (promoEl.value || "").trim();
-      const orderData = {
-        bouquet: "romantic",
-        color: selectedColor,
-        add_ons: selectedAddons.map(x => `${x.name} (+${x.price}₽)`),
-        total_price: Number(totalEl.textContent || 0),
-        promo_code: promo,
-        delivery_type: deliveryType,
-        delivery_price: deliveryPrice
-      };
-
-      sendBtn.disabled = true;
-      sendBtn.textContent = "Отправка…";
-
-      try {
-        if (!tg) {
-          alert("Открой сайт внутри Telegram Mini App. Сейчас tg = null");
-          sendBtn.disabled = false;
-          sendBtn.textContent = "Оформить заказ";
-          return;
-        }
-
-        tg.sendData(JSON.stringify(orderData));
-        setTimeout(() => tg.close(), 600);
-      } catch (e) {
-        alert("sendData error: " + e);
-        sendBtn.disabled = false;
-        sendBtn.textContent = "Оформить заказ";
-      }
-    });
-
-    render();
-  </script>
 </body>
 </html>
