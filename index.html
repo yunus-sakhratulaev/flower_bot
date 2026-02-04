@@ -4,238 +4,201 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Магазин роз</title>
+
+  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    /* твои стили без изменений */
     :root{
-      --bg:#f6f7fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;--line:#e5e7eb;
-      --green:#22c55e;--badge:#facc15;--shadow: 0 10px 25px rgba(15,23,42,.08);--radius: 18px;
+      --bg:#f6f7fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;
+      --line:#e5e7eb;--green:#22c55e;--shadow:0 10px 25px rgba(15,23,42,.08);
+      --radius:18px;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    a{color:inherit;text-decoration:none}
-    .topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:10}
-    .brand{display:flex;gap:10px;align-items:center;font-weight:800;font-size:20px;cursor:pointer}
-    .brand .ico{font-size:22px}
-    .rightIcons{display:flex;align-items:center;gap:14px}
-    .cartBtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .cartBtn span{font-size:20px}
-    .editorBtn{padding:10px 14px;border-radius:14px;border:0;cursor:pointer;background:#111827;color:#fff;font-weight:700;display:flex;gap:8px;align-items:center}
-    .container{max-width:1180px;margin:18px auto;padding:0 16px 120px}
-    .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 16px}
-    .tab{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:700;color:#111827;display:flex;gap:8px;align-items:center}
-    .tab.active{background:var(--green);border-color:var(--green);color:#fff}
-    .tab .e{font-size:16px}
-    .grid{display:grid;gap:18px;grid-template-columns: repeat(3, 1fr)}
-    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} }
-    @media (max-width: 620px){ .grid{grid-template-columns: 1fr;} }
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow: var(--shadow);display:flex;flex-direction:column;min-height: 420px}
-    .imgWrap{position:relative;height:240px;background:#eee;overflow:hidden;cursor:pointer}
-    .imgWrap img{width:100%;height:100%;object-fit:cover;display:block}
-    .badge{position:absolute;top:12px;right:12px;background:rgba(250,204,21,.95);padding:6px 10px;border-radius:999px;font-weight:800;font-size:13px;display:flex;gap:6px;align-items:center}
-    .badge .star{font-size:14px}
-    .cardBody{padding:14px 14px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
-    .title{font-weight:900;font-size:18px;margin:0;cursor:pointer}
-    .desc{margin:0;color:var(--muted);line-height:1.35}
-    .bottomRow{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-    .price{font-weight:900;font-size:26px}
-    .addBtn{background:var(--green);color:#fff;border:0;border-radius:14px;padding:12px 14px;font-weight:900;cursor:pointer;white-space:nowrap}
-    .cartBar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:20}
-    .cartBarLeft{display:flex;flex-direction:column;gap:4px}
-    .cartLine1{font-weight:900}
-    .cartLine2{font-weight:1000;font-size:22px}
-    .cartLine3{color:var(--muted);font-size:13px}
-    .orderBtn{background:#16a34a;color:#fff;border:0;border-radius:16px;padding:14px 16px;font-weight:1000;cursor:pointer;min-width:190px}
-    .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
-    .status{margin:12px 0 0;color:#0f172a;white-space:pre-wrap}
+    .topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+    .brand{font-weight:900;font-size:20px}
+    .container{padding:16px 16px 120px;max-width:720px;margin:0 auto}
+    .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:14px;margin-bottom:14px}
+    .title{font-weight:900;font-size:18px;margin:0 0 6px}
+    .desc{color:var(--muted);margin:0 0 10px}
+    .row{display:flex;justify-content:space-between;align-items:center}
+    .price{font-weight:900;font-size:22px}
+    .btn{background:var(--green);color:#fff;border:0;border-radius:14px;
+      padding:10px 14px;font-weight:900;cursor:pointer}
+    .cartBar{
+      position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+      padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px
+    }
+    .orderBtn{background:#16a34a;color:#fff;border:0;border-radius:16px;
+      padding:14px 16px;font-weight:1000;cursor:pointer}
+    .orderBtn:disabled{background:#a7f3d0;color:#065f46}
   </style>
 </head>
 
 <body>
   <div class="topbar">
-    <div class="brand" id="goHome">
-      <div class="ico">🌹</div>
-      <div>Магазин роз</div>
-    </div>
-
-    <div class="rightIcons">
-      <button class="editorBtn" type="button" onclick="alert('Редактор товаров подключим позже')">⚙️ Редактор товаров</button>
-      <button class="cartBtn" type="button" id="openCart"><span>🛒</span></button>
-    </div>
+    <div class="brand">🌹 Магазин роз</div>
   </div>
 
   <div class="container" id="app"></div>
 
   <div class="cartBar">
-    <div class="cartBarLeft">
-      <div class="cartLine1">Корзина: <span id="cartCount">0</span> шт.</div>
-      <div class="cartLine2">Итого: <span id="cartTotal">0</span> ₽</div>
-      <div class="cartLine3" id="buyerLine">Покупатель: ...</div>
+    <div>
+      <div>Корзина: <b id="cartCount">0</b> шт.</div>
+      <div>Итого: <b id="cartTotal">0</b> ₽</div>
     </div>
     <button class="orderBtn" id="orderBtn" disabled>Оформить заказ</button>
   </div>
 
 <script>
-  // ✅ ВАЖНО: В Telegram шлём на тот же домен Vercel
-  // Здесь должен существовать serverless endpoint /api/order (см. файл api/order.js ниже)
-  const ORDER_ENDPOINT = "/api/order";
+/* ================= НАСТРОЙКИ ================= */
 
-  const tg = window.Telegram?.WebApp;
-  if (tg) { tg.ready(); tg.expand(); }
-  const user = tg?.initDataUnsafe?.user || null;
+// 🔥 ВАЖНО: same-origin, работает в Telegram
+const ORDER_ENDPOINT = "/api/order";
 
-  const buyerText = user
-    ? `Покупатель: ${user.first_name}${user.last_name ? " " + user.last_name : ""} (id ${user.id})`
-    : "Покупатель: Гость (не из Telegram)";
-  document.getElementById("buyerLine").textContent = buyerText;
+/* ================= TELEGRAM ================= */
 
-  const PRODUCTS = [
-    {
-      id: 1, title: 'Красные розы "Классика"', category: "Красные", price: 3500, popular: true,
-      desc: "Букет из 11 свежих красных роз — символ страсти и любви",
-      images: ["https://images.unsplash.com/photo-1548095115-45697e1bd1b3?auto=format&fit=crop&w=1200&q=80"]
-    },
-    {
-      id: 2, title: 'Белые розы "Нежность"', category: "Белые", price: 3200, popular: true,
-      desc: "Элегантный букет из белых роз для особенных моментов",
-      images: ["https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80"]
-    },
-    {
-      id: 3, title: 'Розовые розы "Романтика"', category: "Розовые", price: 2900, popular: true,
-      desc: "Нежный букет из розовых роз — идеален для свиданий",
-      images: ["https://images.unsplash.com/photo-1444392061186-0e23080c310a?auto=format&fit=crop&w=1200&q=80"]
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+const user = tg?.initDataUnsafe?.user || null;
+
+/* ================= ДАННЫЕ ================= */
+
+const PRODUCTS = [
+  {
+    id: 1,
+    title: 'Белые розы "Нежность"',
+    desc: "Элегантный букет для особенных моментов",
+    price: 3200
+  },
+  {
+    id: 2,
+    title: 'Розовые розы "Романтика"',
+    desc: "Идеальны для свиданий",
+    price: 2900
+  }
+];
+
+const cart = new Map();
+
+/* ================= UI ================= */
+
+const app = document.getElementById("app");
+const cartCountEl = document.getElementById("cartCount");
+const cartTotalEl = document.getElementById("cartTotal");
+const orderBtn = document.getElementById("orderBtn");
+
+function render() {
+  app.innerHTML = "";
+  PRODUCTS.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="title">${p.title}</div>
+      <div class="desc">${p.desc}</div>
+      <div class="row">
+        <div class="price">${p.price} ₽</div>
+        <button class="btn">+ В корзину</button>
+      </div>
+    `;
+    card.querySelector("button").onclick = () => {
+      cart.set(p.id, (cart.get(p.id) || 0) + 1);
+      updateCart();
+    };
+    app.appendChild(card);
+  });
+}
+
+function updateCart() {
+  let count = 0;
+  let total = 0;
+  PRODUCTS.forEach(p => {
+    const q = cart.get(p.id) || 0;
+    count += q;
+    total += q * p.price;
+  });
+  cartCountEl.textContent = count;
+  cartTotalEl.textContent = total;
+  orderBtn.disabled = count === 0;
+}
+
+/* ================= ЗАКАЗ ================= */
+
+function buildOrderText() {
+  const lines = [];
+  lines.push("🛒 Новый заказ");
+
+  if (user) {
+    lines.push(`👤 ${user.first_name} ${user.last_name || ""}`);
+    lines.push(`🆔 ${user.id}`);
+    if (user.username) lines.push(`🔗 @${user.username}`);
+  }
+
+  lines.push("");
+  let total = 0;
+  PRODUCTS.forEach(p => {
+    const q = cart.get(p.id);
+    if (q) {
+      const sum = q * p.price;
+      total += sum;
+      lines.push(`• ${p.title} — ${q} × ${p.price} ₽ = ${sum} ₽`);
     }
-  ];
+  });
 
-  const cart = new Map();
-  const app = document.getElementById("app");
-  const cartCountEl = document.getElementById("cartCount");
-  const cartTotalEl = document.getElementById("cartTotal");
-  const orderBtn = document.getElementById("orderBtn");
+  lines.push("");
+  lines.push(`ИТОГО: ${total} ₽`);
+  return lines.join("\n");
+}
 
-  function getQty(id){ return cart.get(id) || 0; }
-  function setQty(id, qty){
-    if (qty <= 0) cart.delete(id);
-    else cart.set(id, qty);
-    updateCartUI();
-  }
-  function calcTotals(){
-    let count = 0, total = 0;
-    for (const p of PRODUCTS){
-      const q = getQty(p.id);
-      if (q>0){ count += q; total += q*p.price; }
-    }
-    return {count,total};
-  }
-  function updateCartUI(){
-    const {count,total} = calcTotals();
-    cartCountEl.textContent = count;
-    cartTotalEl.textContent = String(total);
-    orderBtn.disabled = count === 0;
+async function sendOrder() {
+  if (!user?.id) {
+    alert("Открой магазин внутри Telegram");
+    return;
   }
 
-  function renderCatalog(){
-    app.innerHTML = `<div class="grid" id="grid"></div><div class="status" id="status"></div>`;
-    const grid = document.getElementById("grid");
-    PRODUCTS.forEach(p=>{
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="imgWrap"><img src="${p.images[0]}" alt=""></div>
-        <div class="cardBody">
-          <p class="title">${p.title}</p>
-          <p class="desc">${p.desc}</p>
-          <div class="bottomRow">
-            <div class="price">${p.price} ₽</div>
-            <button class="addBtn">+ В корзину</button>
-          </div>
-        </div>
-      `;
-      card.querySelector(".addBtn").onclick = ()=> setQty(p.id, getQty(p.id)+1);
-      grid.appendChild(card);
+  orderBtn.disabled = true;
+
+  try {
+    const r = await fetch(ORDER_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: buildOrderText(),
+        buyer_id: user.id
+      })
     });
-  }
 
-  function buildOrderText(){
-    const lines = [];
-    lines.push("🛒 Новый заказ");
+    const raw = await r.text();
 
-    if (user){
-      const name = `${user.first_name}${user.last_name ? " " + user.last_name : ""}`;
-      lines.push(`👤 ${name}`);
-      lines.push(`🆔 ${user.id}`);
-      if (user.username) lines.push(`🔗 @${user.username}`);
-    } else {
-      lines.push("👤 Гость (не из Telegram)");
-    }
-
-    lines.push("");
-    lines.push("Состав заказа:");
-
-    let total = 0;
-    for (const p of PRODUCTS){
-      const q = getQty(p.id);
-      if (q>0){
-        const sum = q*p.price;
-        total += sum;
-        lines.push(`• ${p.title} — ${q} шт × ${p.price} ₽ = ${sum} ₽`);
-      }
-    }
-    lines.push("");
-    lines.push(`ИТОГО: ${total} ₽`);
-    return lines.join("\n");
-  }
-
-  async function sendOrder(){
-    const {count} = calcTotals();
-    if (count === 0) return;
-
-    const buyerId = user?.id || 0;
-    if (!buyerId) {
-      alert("Открой mini-app внутри Telegram, чтобы оформить заказ.");
+    if (!r.ok) {
+      alert(`Ошибка ${r.status}:\n${raw}`);
+      orderBtn.disabled = false;
       return;
     }
 
-    orderBtn.disabled = true;
+    cart.clear();
+    updateCart();
+    tg?.showAlert("Заказ отправлен ✅");
 
-    try{
-      const r = await fetch(ORDER_ENDPOINT, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({
-          text: buildOrderText(),
-          buyer_id: buyerId
-        })
-      });
-
-      const raw = await r.text();
-      let data = {};
-      try { data = JSON.parse(raw); } catch {}
-
-      if (!r.ok){
-        alert(`Ошибка: status=${r.status}\n${raw}`);
-        orderBtn.disabled = false;
-        return;
-      }
-
-      cart.clear();
-      updateCartUI();
-      if (tg) tg.showAlert("Заказ отправлен ✅");
-      else alert("Заказ отправлен ✅");
-
-    } catch(e){
-      alert("Сетевая ошибка: " + e);
-      orderBtn.disabled = false;
-    }
+  } catch (e) {
+    alert("Сетевая ошибка:\n" + e);
+    orderBtn.disabled = false;
   }
+}
 
-  orderBtn.onclick = sendOrder;
-  document.getElementById("goHome").onclick = renderCatalog;
-  document.getElementById("openCart").onclick = ()=> alert(buildOrderText());
+orderBtn.onclick = sendOrder;
 
-  updateCartUI();
-  renderCatalog();
+/* ================= START ================= */
+
+render();
+updateCart();
 </script>
 </body>
 </html>
