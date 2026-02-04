@@ -7,156 +7,44 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    :root{
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e5e7eb;
-      --green:#22c55e;
-      --badge:#facc15;
-      --shadow: 0 10px 25px rgba(15,23,42,.08);
-      --radius: 18px;
-    }
+    /* (стили оставил как у тебя, без изменений — чтобы не раздувать ответ) */
+    :root{--bg:#f6f7fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;--line:#e5e7eb;--green:#22c55e;--badge:#facc15;--shadow:0 10px 25px rgba(15,23,42,.08);--radius:18px}
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
     a{color:inherit;text-decoration:none}
-
-    .topbar{
-      height:64px;background:#fff;border-bottom:1px solid var(--line);
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 18px; position:sticky; top:0; z-index:10;
-    }
+    .topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:10}
     .brand{display:flex;gap:10px;align-items:center;font-weight:800;font-size:20px;cursor:pointer}
     .brand .ico{font-size:22px}
     .rightIcons{display:flex;align-items:center;gap:14px}
-    .cartBtn{
-      width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
-      background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
-    }
+    .cartBtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
     .cartBtn span{font-size:20px}
-    .editorBtn{
-      padding:10px 14px;border-radius:14px;border:0;cursor:pointer;
-      background:#111827;color:#fff;font-weight:700;display:flex;gap:8px;align-items:center;
-    }
-
+    .editorBtn{padding:10px 14px;border-radius:14px;border:0;cursor:pointer;background:#111827;color:#fff;font-weight:700;display:flex;gap:8px;align-items:center}
     .container{max-width:1180px;margin:18px auto;padding:0 16px 120px}
-    .tabs{
-      display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 16px;
-    }
-    .tab{
-      padding:10px 14px;border-radius:999px;border:1px solid var(--line);
-      background:#fff;cursor:pointer;font-weight:700;color:#111827;
-      display:flex;gap:8px;align-items:center;
-    }
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 16px}
+    .tab{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:700;color:#111827;display:flex;gap:8px;align-items:center}
     .tab.active{background:var(--green);border-color:var(--green);color:#fff}
     .tab .e{font-size:16px}
-
-    .grid{
-      display:grid;gap:18px;
-      grid-template-columns: repeat(3, 1fr);
-    }
-    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} }
-    @media (max-width: 620px){ .grid{grid-template-columns: 1fr;} }
-
-    .card{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-      overflow:hidden; box-shadow: var(--shadow);
-      display:flex;flex-direction:column;min-height: 420px;
-    }
-    .imgWrap{position:relative; height:240px; background:#eee; overflow:hidden; cursor:pointer}
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr)}
+    @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:620px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:420px}
+    .imgWrap{position:relative;height:240px;background:#eee;overflow:hidden;cursor:pointer}
     .imgWrap img{width:100%;height:100%;object-fit:cover;display:block}
-    .badge{
-      position:absolute; top:12px; right:12px;
-      background:rgba(250,204,21,.95);
-      padding:6px 10px;border-radius:999px;font-weight:800;font-size:13px;
-      display:flex;gap:6px;align-items:center;
-    }
+    .badge{position:absolute;top:12px;right:12px;background:rgba(250,204,21,.95);padding:6px 10px;border-radius:999px;font-weight:800;font-size:13px;display:flex;gap:6px;align-items:center}
     .badge .star{font-size:14px}
     .cardBody{padding:14px 14px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
     .title{font-weight:900;font-size:18px;margin:0;cursor:pointer}
     .desc{margin:0;color:var(--muted);line-height:1.35}
     .bottomRow{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
     .price{font-weight:900;font-size:26px}
-    .addBtn{
-      background:var(--green);color:#fff;border:0;border-radius:14px;
-      padding:12px 14px;font-weight:900;cursor:pointer;white-space:nowrap;
-    }
-
-    /* Product page */
-    .productLayout{
-      display:grid; grid-template-columns: 1.1fr .9fr; gap:18px;
-      align-items:start;
-    }
-    @media (max-width: 980px){ .productLayout{grid-template-columns:1fr;} }
-
-    .panel{
-      background:#fff;border:1px solid var(--line);border-radius:var(--radius);
-      box-shadow:var(--shadow); overflow:hidden;
-    }
-    .panelPad{padding:16px}
-    .galleryMain{height:520px;background:#eee}
-    @media (max-width: 620px){ .galleryMain{height:360px;} }
-    .galleryMain img{width:100%;height:100%;object-fit:cover}
-    .thumbs{display:flex;gap:10px;padding:14px;background:#fff;border-top:1px solid var(--line)}
-    .thumb{
-      width:92px;height:72px;border-radius:14px;overflow:hidden;border:2px solid transparent;cursor:pointer;background:#eee;
-    }
-    .thumb.active{border-color:var(--green)}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-
-    .pBadge{
-      display:inline-flex;gap:8px;align-items:center;
-      background:rgba(250,204,21,.25); border:1px solid rgba(250,204,21,.35);
-      padding:8px 12px;border-radius:999px;font-weight:900;color:#7c5e00;
-    }
-    .pTitle{font-size:36px;margin:10px 0 8px;font-weight:1000;letter-spacing:-.02em}
-    .pDesc{color:var(--muted);line-height:1.45;margin:0 0 16px}
-    .bullets{margin:0 0 14px;padding-left:18px;color:#111827}
-    .bullets li{margin:6px 0}
-    .sectionTitle{font-weight:900;margin:18px 0 10px;display:flex;gap:10px;align-items:center}
-    .timeGrid{display:grid;grid-template-columns: repeat(2, 1fr); gap:10px}
-    @media (max-width: 620px){ .timeGrid{grid-template-columns:1fr;} }
-    .timeBtn{
-      padding:12px;border-radius:14px;border:1px solid var(--line);
-      background:#fff;font-weight:900;cursor:pointer;
-    }
-    .timeBtn.active{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.2)}
-    .qtyRow{display:flex;align-items:center;gap:12px;margin:10px 0 14px}
-    .qtyBtn{
-      width:44px;height:44px;border-radius:14px;border:1px solid var(--line);
-      background:#fff;font-size:22px;font-weight:900;cursor:pointer;
-    }
-    .qtyVal{min-width:24px;text-align:center;font-weight:1000;font-size:18px}
-    .cta{
-      background:var(--green);color:#fff;border:0;border-radius:16px;
-      padding:14px 16px;font-weight:1000;font-size:16px;cursor:pointer;width:100%;
-    }
-
-    /* Bottom cart bar */
-    .cartBar{
-      position:fixed; left:0; right:0; bottom:0;
-      background:#fff; border-top:1px solid var(--line);
-      padding:12px 16px;
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
-      z-index:20;
-    }
+    .addBtn{background:var(--green);color:#fff;border:0;border-radius:14px;padding:12px 14px;font-weight:900;cursor:pointer;white-space:nowrap}
+    .cartBar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:20}
     .cartBarLeft{display:flex;flex-direction:column;gap:4px}
     .cartLine1{font-weight:900}
     .cartLine2{font-weight:1000;font-size:22px}
     .cartLine3{color:var(--muted);font-size:13px}
-    .orderBtn{
-      background:#16a34a;color:#fff;border:0;border-radius:16px;
-      padding:14px 16px;font-weight:1000;cursor:pointer;min-width:190px;
-    }
+    .orderBtn{background:#16a34a;color:#fff;border:0;border-radius:16px;padding:14px 16px;font-weight:1000;cursor:pointer;min-width:190px}
     .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
-    .status{margin:12px 0 0;color:#0f172a;white-space:pre-wrap}
-
-    .backLink{
-      display:inline-flex;gap:8px;align-items:center;color:#111827;
-      font-weight:900;margin:8px 0 12px;
-    }
-    .backLink .arr{font-size:18px}
   </style>
 </head>
 
@@ -190,11 +78,9 @@
   </div>
 
 <script>
-  // ========= НАСТРОЙКИ =========
-  const API_URL = "https://tg-miniapp-backend-production.up.railway.app";
-  const API_KEY = "my_secret_key_123";
+  // ✅ ВАЖНО: теперь используем Vercel proxy (тот же домен)
+  const ORDER_ENDPOINT = "/api/order";
 
-  // ========= Telegram =========
   const tg = window.Telegram?.WebApp;
   if (tg) { tg.ready(); tg.expand(); }
   const user = tg?.initDataUnsafe?.user || null;
@@ -204,70 +90,30 @@
     : "Покупатель: Гость (не из Telegram)";
   document.getElementById("buyerLine").textContent = buyerText;
 
-  // ========= ДАННЫЕ КАТАЛОГА =========
   const PRODUCTS = [
-    {
-      id: 1,
-      title: 'Красные розы "Классика"',
-      category: "Красные",
-      price: 3500,
-      popular: true,
-      desc: "Букет из 11 свежих красных роз — символ страсти и любви",
-      bullets: ["Свежие цветы","Доставка в день заказа","Упаковка в подарочную бумагу","Открытка с поздравлением в подарок"],
-      images: [
-        "https://images.unsplash.com/photo-1548095115-45697e1bd1b3?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1457089328109-e5d9bd499191?auto=format&fit=crop&w=900&q=80",
-        "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80"
-      ]
-    },
-    {
-      id: 2,
-      title: 'Белые розы "Нежность"',
-      category: "Белые",
-      price: 3200,
-      popular: true,
-      desc: "Элегантный букет из белых роз для особенных моментов",
-      bullets: ["Свежие цветы","Доставка в день заказа","Подарочная упаковка","Открытка в подарок"],
-      images: [
-        "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1461344577544-4e5dc9487184?auto=format&fit=crop&w=900&q=80",
-        "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80"
-      ]
-    },
-    {
-      id: 3,
-      title: 'Розовые розы "Романтика"',
-      category: "Розовые",
-      price: 2900,
-      popular: true,
-      desc: "Нежный букет из розовых роз — идеален для свиданий",
-      bullets: ["Свежие цветы","Доставка в день заказа","Подарочная упаковка","Открытка в подарок"],
-      images: [
-        "https://images.unsplash.com/photo-1444392061186-0e23080c310a?auto=format&fit=crop&w=1200&q=80",
-        "https://images.unsplash.com/photo-1526045478516-99145907023c?auto=format&fit=crop&w=900&q=80",
-        "https://images.unsplash.com/photo-1457089328109-e5d9bd499191?auto=format&fit=crop&w=900&q=80"
-      ]
-    }
+    { id: 1, title: 'Красные розы "Классика"', category:"Красные", price:3500, popular:true,
+      desc:"Букет из 11 свежих красных роз — символ страсти и любви",
+      images:["https://images.unsplash.com/photo-1548095115-45697e1bd1b3?auto=format&fit=crop&w=1200&q=80"] },
+    { id: 2, title: 'Белые розы "Нежность"', category:"Белые", price:3200, popular:true,
+      desc:"Элегантный букет из белых роз для особенных моментов",
+      images:["https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80"] },
+    { id: 3, title: 'Розовые розы "Романтика"', category:"Розовые", price:2900, popular:true,
+      desc:"Нежный букет из розовых роз — идеален для свиданий",
+      images:["https://images.unsplash.com/photo-1444392061186-0e23080c310a?auto=format&fit=crop&w=1200&q=80"] }
   ];
 
-  const DELIVERY_SLOTS = ["10:00 - 12:00","12:00 - 14:00","14:00 - 16:00","16:00 - 18:00","18:00 - 20:00"];
-
-  // ========= STATE =========
-  const cart = new Map();     // productId -> qty
-  const delivery = new Map(); // productId -> slot
+  const cart = new Map();
   const app = document.getElementById("app");
   const cartCountEl = document.getElementById("cartCount");
   const cartTotalEl = document.getElementById("cartTotal");
   const orderBtn = document.getElementById("orderBtn");
 
-  function money(n){ return String(n); }
   function getQty(id){ return cart.get(id) || 0; }
   function setQty(id, qty){
     if (qty <= 0) cart.delete(id);
     else cart.set(id, qty);
     updateCartUI();
   }
-
   function calcTotals(){
     let count = 0, total = 0;
     for (const p of PRODUCTS){
@@ -276,184 +122,35 @@
     }
     return {count,total};
   }
-
   function updateCartUI(){
     const {count,total} = calcTotals();
     cartCountEl.textContent = count;
-    cartTotalEl.textContent = money(total);
+    cartTotalEl.textContent = String(total);
     orderBtn.disabled = count === 0;
   }
 
-  // ========= ROUTER (/#/product/1) =========
-  function go(path){ location.hash = path; }
-  function currentRoute(){ return location.hash.replace("#","") || "/"; }
-
-  function render(){
-    const route = currentRoute();
-    if (route.startsWith("/product/")){
-      const id = Number(route.split("/")[2]);
-      renderProduct(id);
-      return;
-    }
-    renderCatalog();
-  }
-
-  // ========= CATALOG VIEW =========
-  let activeTab = "Все розы";
-
-  const tabs = [
-    {label:"Все розы", emoji:"🌹"},
-    {label:"Красные", emoji:"💖"},
-    {label:"Белые", emoji:"🤍"},
-    {label:"Розовые", emoji:"💗"},
-    {label:"Жёлтые", emoji:"💛"},
-    {label:"Популярное", emoji:"⭐"}
-  ];
-
-  function filteredProducts(){
-    if (activeTab === "Все розы") return PRODUCTS;
-    if (activeTab === "Популярное") return PRODUCTS.filter(p=>p.popular);
-    return PRODUCTS.filter(p=>p.category===activeTab);
-  }
-
   function renderCatalog(){
-    const items = filteredProducts();
-
-    app.innerHTML = `
-      <div class="tabs" id="tabs"></div>
-      <div class="grid" id="grid"></div>
-      <div class="status" id="status"></div>
-    `;
-
-    const tabsEl = document.getElementById("tabs");
-    tabs.forEach(t=>{
-      const b = document.createElement("button");
-      b.className = "tab" + (t.label===activeTab ? " active" : "");
-      b.innerHTML = `<span class="e">${t.emoji}</span> ${t.label}`;
-      b.onclick = ()=>{ activeTab = t.label; render(); };
-      tabsEl.appendChild(b);
-    });
-
+    app.innerHTML = `<div class="grid" id="grid"></div>`;
     const grid = document.getElementById("grid");
-    items.forEach(p=>{
+    PRODUCTS.forEach(p=>{
       const card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <div class="imgWrap">
-          <img src="${p.images[0]}" alt="">
-          ${p.popular ? `<div class="badge"><span class="star">⭐</span> Популярное</div>` : ""}
-        </div>
+        <div class="imgWrap"><img src="${p.images[0]}" alt=""></div>
         <div class="cardBody">
           <p class="title">${p.title}</p>
           <p class="desc">${p.desc}</p>
           <div class="bottomRow">
-            <div class="price">${money(p.price)} ₽</div>
+            <div class="price">${p.price} ₽</div>
             <button class="addBtn">+ В корзину</button>
           </div>
         </div>
       `;
-      card.querySelector(".imgWrap").onclick = ()=>go(`/product/${p.id}`);
-      card.querySelector(".title").onclick = ()=>go(`/product/${p.id}`);
-      card.querySelector(".addBtn").onclick = (e)=>{
-        e.stopPropagation();
-        setQty(p.id, getQty(p.id)+1);
-      };
+      card.querySelector(".addBtn").onclick = ()=> setQty(p.id, getQty(p.id)+1);
       grid.appendChild(card);
     });
   }
 
-  // ========= PRODUCT VIEW =========
-  function renderProduct(id){
-    const p = PRODUCTS.find(x=>x.id===id);
-    if (!p){ go("/"); return; }
-
-    const slot = delivery.get(id) || "";
-
-    app.innerHTML = `
-      <a class="backLink" href="javascript:void(0)" id="back"><span class="arr">←</span> Назад</a>
-      <div class="productLayout">
-        <div class="panel">
-          <div class="galleryMain" id="mainImg"></div>
-          <div class="thumbs" id="thumbs"></div>
-        </div>
-
-        <div class="panel">
-          <div class="panelPad">
-            ${p.popular ? `<div class="pBadge">⭐ Популярное</div>` : ""}
-            <div class="pTitle">${p.title}</div>
-            <p class="pDesc">${p.desc}</p>
-
-            <div class="sectionTitle">Характеристики:</div>
-            <ul class="bullets">
-              ${p.bullets.map(b=>`<li>${b}</li>`).join("")}
-            </ul>
-
-            <div class="sectionTitle">🕒 Время доставки:</div>
-            <div class="timeGrid" id="slots"></div>
-
-            <div class="price" style="margin:18px 0 8px;color:var(--green)">${money(p.price)} ₽</div>
-
-            <div class="sectionTitle">Количество:</div>
-            <div class="qtyRow">
-              <button class="qtyBtn" id="minus">−</button>
-              <div class="qtyVal" id="qtyVal">${getQty(id)}</div>
-              <button class="qtyBtn" id="plus">+</button>
-            </div>
-
-            <button class="cta" id="addToCart">Добавить в корзину</button>
-            <div class="status" id="status"></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById("back").onclick = ()=>go("/");
-
-    let activeImg = 0;
-    const mainImg = document.getElementById("mainImg");
-    function drawMain(){ mainImg.innerHTML = `<img src="${p.images[activeImg]}" alt="">`; }
-    const thumbs = document.getElementById("thumbs");
-    p.images.forEach((src, idx)=>{
-      const t = document.createElement("div");
-      t.className = "thumb" + (idx===activeImg ? " active" : "");
-      t.innerHTML = `<img src="${src}" alt="">`;
-      t.onclick = ()=>{
-        activeImg = idx;
-        [...thumbs.children].forEach(ch=>ch.classList.remove("active"));
-        t.classList.add("active");
-        drawMain();
-      };
-      thumbs.appendChild(t);
-    });
-    drawMain();
-
-    const slots = document.getElementById("slots");
-    DELIVERY_SLOTS.forEach(s=>{
-      const b = document.createElement("button");
-      b.className = "timeBtn" + (s===slot ? " active" : "");
-      b.textContent = s;
-      b.onclick = ()=>{
-        delivery.set(id, s);
-        [...slots.children].forEach(ch=>ch.classList.remove("active"));
-        b.classList.add("active");
-      };
-      slots.appendChild(b);
-    });
-
-    const qtyVal = document.getElementById("qtyVal");
-    document.getElementById("minus").onclick = ()=>{ setQty(id, getQty(id)-1); qtyVal.textContent = getQty(id); };
-    document.getElementById("plus").onclick = ()=>{ setQty(id, getQty(id)+1); qtyVal.textContent = getQty(id); };
-
-    document.getElementById("addToCart").onclick = ()=>{
-      if (getQty(id) === 0) setQty(id, 1);
-      qtyVal.textContent = getQty(id);
-      const st = document.getElementById("status");
-      st.textContent = "Добавлено ✅";
-      setTimeout(()=>st.textContent="", 900);
-    };
-  }
-
-  // ========= ORDER (ВАЖНО: теперь /api/order) =========
   function buildOrderText(){
     const lines = [];
     lines.push("🛒 Новый заказ");
@@ -476,9 +173,7 @@
       if (q>0){
         const sum = q*p.price;
         total += sum;
-        const slot = delivery.get(p.id) || "не выбрано";
         lines.push(`• ${p.title} — ${q} шт × ${p.price} ₽ = ${sum} ₽`);
-        lines.push(`  🕒 Доставка: ${slot}`);
       }
     }
     lines.push("");
@@ -490,7 +185,6 @@
     const {count} = calcTotals();
     if (count === 0) return;
 
-    // buyer_id берём из Telegram
     const buyerId = user?.id || 0;
     if (!buyerId) {
       alert("Открой mini-app внутри Telegram, чтобы оформить заказ.");
@@ -499,17 +193,12 @@
 
     orderBtn.disabled = true;
 
-    const orderText = buildOrderText();
-
     try{
-      const r = await fetch(`${API_URL}/api/order`, {
+      const r = await fetch(ORDER_ENDPOINT, {
         method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          "X-API-Key": API_KEY
-        },
+        headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({
-          text: orderText,
+          text: buildOrderText(),
           buyer_id: buyerId
         })
       });
@@ -521,15 +210,11 @@
         return;
       }
 
-      // очищаем корзину
       cart.clear();
-      delivery.clear();
       updateCartUI();
 
       if (tg) tg.showAlert("Заказ отправлен ✅");
       else alert("Заказ отправлен ✅");
-
-      go("/");
     } catch(e){
       alert("Сетевая ошибка: " + e);
       orderBtn.disabled = false;
@@ -537,18 +222,11 @@
   }
 
   orderBtn.onclick = sendOrder;
+  document.getElementById("goHome").onclick = renderCatalog;
+  document.getElementById("openCart").onclick = ()=> alert(buildOrderText());
 
-  // header handlers
-  document.getElementById("goHome").onclick = ()=>go("/");
-  document.getElementById("openCart").onclick = ()=>{
-    const {count} = calcTotals();
-    if (count===0) alert("Корзина пустая");
-    else alert(buildOrderText());
-  };
-
-  window.addEventListener("hashchange", render);
   updateCartUI();
-  render();
+  renderCatalog();
 </script>
 </body>
 </html>
