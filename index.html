@@ -7,38 +7,29 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    :root{
-      --bg:#f6f7fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;
-      --line:#e5e7eb;--green:#22c55e;--shadow:0 10px 25px rgba(15,23,42,.08);
-      --radius:18px;
-    }
+    :root{--bg:#f6f7fb;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e5e7eb;--green:#22c55e;--shadow:0 10px 25px rgba(15,23,42,.08);--radius:18px;}
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    .topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);
-      display:flex;align-items:center;justify-content:space-between;padding:0 16px}
-    .brand{font-weight:900;font-size:20px}
-    .container{padding:16px 16px 120px;max-width:720px;margin:0 auto}
-    .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);
-      box-shadow:var(--shadow);padding:14px;margin-bottom:14px}
+    .topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0}
+    .brand{font-weight:900;font-size:20px;display:flex;gap:10px;align-items:center}
+    .container{padding:16px 16px 120px;max-width:820px;margin:0 auto}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:14px}
     .title{font-weight:900;font-size:18px;margin:0 0 6px}
-    .desc{color:var(--muted);margin:0 0 10px}
-    .row{display:flex;justify-content:space-between;align-items:center}
+    .desc{color:var(--muted);margin:0 0 10px;line-height:1.35}
+    .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
     .price{font-weight:900;font-size:22px}
-    .btn{background:var(--green);color:#fff;border:0;border-radius:14px;
-      padding:10px 14px;font-weight:900;cursor:pointer}
-    .cartBar{
-      position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
-      padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px
-    }
-    .orderBtn{background:#16a34a;color:#fff;border:0;border-radius:16px;
-      padding:14px 16px;font-weight:1000;cursor:pointer}
-    .orderBtn:disabled{background:#a7f3d0;color:#065f46}
+    .btn{background:var(--green);color:#fff;border:0;border-radius:14px;padding:10px 14px;font-weight:900;cursor:pointer;white-space:nowrap}
+    .cartBar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .orderBtn{background:#16a34a;color:#fff;border:0;border-radius:16px;padding:14px 16px;font-weight:1000;cursor:pointer;min-width:180px}
+    .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
+    .small{font-size:12px;color:var(--muted)}
   </style>
 </head>
 
 <body>
   <div class="topbar">
-    <div class="brand">🌹 Магазин роз</div>
+    <div class="brand">🌹 <span>Магазин роз</span></div>
+    <div class="small" id="buyerLine">Покупатель: ...</div>
   </div>
 
   <div class="container" id="app"></div>
@@ -47,26 +38,26 @@
     <div>
       <div>Корзина: <b id="cartCount">0</b> шт.</div>
       <div>Итого: <b id="cartTotal">0</b> ₽</div>
-      <div style="font-size:12px;color:#64748b" id="buyerLine">Покупатель: ...</div>
     </div>
     <button class="orderBtn" id="orderBtn" disabled>Оформить заказ</button>
   </div>
 
 <script>
-  // ✅ same-origin (Vercel), а Vercel сам проксирует на Railway через vercel.json
+  // ✅ same-origin -> Vercel -> rewrite -> Railway
   const ORDER_ENDPOINT = "/api/order";
 
   const tg = window.Telegram?.WebApp;
   if (tg) { tg.ready(); tg.expand(); }
-
   const user = tg?.initDataUnsafe?.user || null;
-  document.getElementById("buyerLine").textContent =
-    user ? `Покупатель: ${user.first_name}${user.last_name ? " " + user.last_name : ""} (id ${user.id})`
-         : "Покупатель: гость (открой в Telegram)";
+
+  document.getElementById("buyerLine").textContent = user
+    ? `Покупатель: ${user.first_name}${user.last_name ? " " + user.last_name : ""} (id ${user.id})`
+    : `Покупатель: гость (открой в Telegram)`;
 
   const PRODUCTS = [
-    { id: 1, title: 'Белые розы "Нежность"', desc: "Элегантный букет для особенных моментов", price: 3200 },
-    { id: 2, title: 'Розовые розы "Романтика"', desc: "Идеальны для свиданий", price: 2900 }
+    { id: 1, title: 'Красные розы "Классика"', desc: "Букет из 11 свежих красных роз — символ страсти и любви", price: 3500 },
+    { id: 2, title: 'Белые розы "Нежность"', desc: "Элегантный букет из белых роз для особенных моментов", price: 3200 },
+    { id: 3, title: 'Розовые розы "Романтика"', desc: "Нежный букет из розовых роз — идеален для свиданий", price: 2900 }
   ];
 
   const cart = new Map();
@@ -98,8 +89,7 @@
   }
 
   function updateCart() {
-    let count = 0;
-    let total = 0;
+    let count = 0, total = 0;
     PRODUCTS.forEach(p => {
       const q = cart.get(p.id) || 0;
       count += q;
@@ -115,16 +105,19 @@
     lines.push("🛒 Новый заказ");
 
     if (user) {
-      lines.push(`👤 ${user.first_name}${user.last_name ? " " + user.last_name : ""}`);
+      const name = `${user.first_name}${user.last_name ? " " + user.last_name : ""}`;
+      lines.push(`👤 ${name}`);
       lines.push(`🆔 ${user.id}`);
       if (user.username) lines.push(`🔗 @${user.username}`);
     }
 
     lines.push("");
+    lines.push("Состав заказа:");
+
     let total = 0;
     PRODUCTS.forEach(p => {
-      const q = cart.get(p.id);
-      if (q) {
+      const q = cart.get(p.id) || 0;
+      if (q > 0) {
         const sum = q * p.price;
         total += sum;
         lines.push(`• ${p.title} — ${q} × ${p.price} ₽ = ${sum} ₽`);
@@ -138,7 +131,7 @@
 
   async function sendOrder() {
     if (!user?.id) {
-      alert("Открой мини-приложение внутри Telegram.");
+      alert("Открой магазин внутри Telegram, чтобы оформить заказ.");
       return;
     }
 
@@ -162,6 +155,7 @@
         return;
       }
 
+      // успех
       cart.clear();
       updateCart();
 
