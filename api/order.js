@@ -1,46 +1,44 @@
 export default async function handler(req, res) {
   try {
-    // Проверка ENV
-    const backendUrl = process.env.BACKEND_URL;
-    const apiKey = process.env.API_KEY;
+    if (req.method === "OPTIONS") return res.status(204).end();
+    if (req.method !== "POST") return res.status(405).json({ detail: "Method not allowed" });
 
-    if (!backendUrl) {
-      return res.status(500).json({ detail: "BACKEND_URL is not set on Vercel" });
+    const backendUrl = process.env.BACKEND_URL; // https://tg-miniapp-backend-production.up.railway.app
+    const apiKey = process.env.API_KEY;         // тот же, что на Railway
+
+    if (!backendUrl) return res.status(500).json({ detail: "BACKEND_URL is not set on Vercel" });
+    if (!apiKey) return res.status(500).json({ detail: "API_KEY is not set on Vercel" });
+
+    // ✅ гарантируем, что body — объект
+    let body = req.body;
+    if (!body || typeof body !== "object") {
+      try { body = JSON.parse(req.body || "{}"); } catch { body = {}; }
     }
-    if (!apiKey) {
-      return res.status(500).json({ detail: "API_KEY is not set on Vercel" });
-    }
 
-    // Важно для Vercel: убедимся, что body объект
-    const body = req.body && typeof req.body === "object" ? req.body : (() => {
-      try { return JSON.parse(req.body || "{}"); } catch { return {}; }
-    })();
-
-    // Мини-валидация
     if (!body.text || !body.buyer_id) {
-      return res.status(400).json({ detail: "Missing text or buyer_id", body });
+      return res.status(400).json({ detail: "Missing text or buyer_id", got: body });
     }
 
     const r = await fetch(`${backendUrl}/api/order`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-API-Key": apiKey,
+        "X-API-Key": apiKey,   // FastAPI прочитает как x-api-key (регистр не важен)
       },
       body: JSON.stringify(body),
     });
 
     const raw = await r.text();
-
-    // Пробуем вернуть как JSON
     res.status(r.status);
-    try {
-      return res.json(JSON.parse(raw));
-    } catch {
-      return res.send(raw);
-    }
+
+    // ппробуем отдать JSON, иначе текст
+    try { return res.json(JSON.parse(raw)); }
+    catch { return res.send(raw); }
+
   } catch (e) {
-    // ПОЛНЫЙ текст ошибки наружу
-    return res.status(500).json({ detail: String(e), stack: e?.stack || null });
+    return res.status(500).json({
+      detail: String(e),
+      stack: e?.stack || null
+    });
   }
 }
