@@ -7,8 +7,11 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    /* (стили оставил как у тебя, без изменений — чтобы не раздувать ответ) */
-    :root{--bg:#f6f7fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;--line:#e5e7eb;--green:#22c55e;--badge:#facc15;--shadow:0 10px 25px rgba(15,23,42,.08);--radius:18px}
+    /* твои стили без изменений */
+    :root{
+      --bg:#f6f7fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;--line:#e5e7eb;
+      --green:#22c55e;--badge:#facc15;--shadow: 0 10px 25px rgba(15,23,42,.08);--radius: 18px;
+    }
     *{box-sizing:border-box}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
     a{color:inherit;text-decoration:none}
@@ -24,10 +27,10 @@
     .tab{padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:700;color:#111827;display:flex;gap:8px;align-items:center}
     .tab.active{background:var(--green);border-color:var(--green);color:#fff}
     .tab .e{font-size:16px}
-    .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr)}
-    @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:620px){.grid{grid-template-columns:1fr}}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:420px}
+    .grid{display:grid;gap:18px;grid-template-columns: repeat(3, 1fr)}
+    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width: 620px){ .grid{grid-template-columns: 1fr;} }
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow: var(--shadow);display:flex;flex-direction:column;min-height: 420px}
     .imgWrap{position:relative;height:240px;background:#eee;overflow:hidden;cursor:pointer}
     .imgWrap img{width:100%;height:100%;object-fit:cover;display:block}
     .badge{position:absolute;top:12px;right:12px;background:rgba(250,204,21,.95);padding:6px 10px;border-radius:999px;font-weight:800;font-size:13px;display:flex;gap:6px;align-items:center}
@@ -45,6 +48,7 @@
     .cartLine3{color:var(--muted);font-size:13px}
     .orderBtn{background:#16a34a;color:#fff;border:0;border-radius:16px;padding:14px 16px;font-weight:1000;cursor:pointer;min-width:190px}
     .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
+    .status{margin:12px 0 0;color:#0f172a;white-space:pre-wrap}
   </style>
 </head>
 
@@ -56,13 +60,8 @@
     </div>
 
     <div class="rightIcons">
-      <button class="editorBtn" type="button" onclick="alert('Редактор товаров подключим позже')">
-        ⚙️ Редактор товаров
-      </button>
-
-      <button class="cartBtn" type="button" id="openCart">
-        <span>🛒</span>
-      </button>
+      <button class="editorBtn" type="button" onclick="alert('Редактор товаров подключим позже')">⚙️ Редактор товаров</button>
+      <button class="cartBtn" type="button" id="openCart"><span>🛒</span></button>
     </div>
   </div>
 
@@ -78,7 +77,8 @@
   </div>
 
 <script>
-  // ✅ ВАЖНО: теперь используем Vercel proxy (тот же домен)
+  // ✅ ВАЖНО: В Telegram шлём на тот же домен Vercel
+  // Здесь должен существовать serverless endpoint /api/order (см. файл api/order.js ниже)
   const ORDER_ENDPOINT = "/api/order";
 
   const tg = window.Telegram?.WebApp;
@@ -91,15 +91,21 @@
   document.getElementById("buyerLine").textContent = buyerText;
 
   const PRODUCTS = [
-    { id: 1, title: 'Красные розы "Классика"', category:"Красные", price:3500, popular:true,
-      desc:"Букет из 11 свежих красных роз — символ страсти и любви",
-      images:["https://images.unsplash.com/photo-1548095115-45697e1bd1b3?auto=format&fit=crop&w=1200&q=80"] },
-    { id: 2, title: 'Белые розы "Нежность"', category:"Белые", price:3200, popular:true,
-      desc:"Элегантный букет из белых роз для особенных моментов",
-      images:["https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80"] },
-    { id: 3, title: 'Розовые розы "Романтика"', category:"Розовые", price:2900, popular:true,
-      desc:"Нежный букет из розовых роз — идеален для свиданий",
-      images:["https://images.unsplash.com/photo-1444392061186-0e23080c310a?auto=format&fit=crop&w=1200&q=80"] }
+    {
+      id: 1, title: 'Красные розы "Классика"', category: "Красные", price: 3500, popular: true,
+      desc: "Букет из 11 свежих красных роз — символ страсти и любви",
+      images: ["https://images.unsplash.com/photo-1548095115-45697e1bd1b3?auto=format&fit=crop&w=1200&q=80"]
+    },
+    {
+      id: 2, title: 'Белые розы "Нежность"', category: "Белые", price: 3200, popular: true,
+      desc: "Элегантный букет из белых роз для особенных моментов",
+      images: ["https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80"]
+    },
+    {
+      id: 3, title: 'Розовые розы "Романтика"', category: "Розовые", price: 2900, popular: true,
+      desc: "Нежный букет из розовых роз — идеален для свиданий",
+      images: ["https://images.unsplash.com/photo-1444392061186-0e23080c310a?auto=format&fit=crop&w=1200&q=80"]
+    }
   ];
 
   const cart = new Map();
@@ -130,7 +136,7 @@
   }
 
   function renderCatalog(){
-    app.innerHTML = `<div class="grid" id="grid"></div>`;
+    app.innerHTML = `<div class="grid" id="grid"></div><div class="status" id="status"></div>`;
     const grid = document.getElementById("grid");
     PRODUCTS.forEach(p=>{
       const card = document.createElement("div");
@@ -203,18 +209,21 @@
         })
       });
 
-      const data = await r.json().catch(()=> ({}));
+      const raw = await r.text();
+      let data = {};
+      try { data = JSON.parse(raw); } catch {}
+
       if (!r.ok){
-        alert("Ошибка: " + JSON.stringify(data));
+        alert(`Ошибка: status=${r.status}\n${raw}`);
         orderBtn.disabled = false;
         return;
       }
 
       cart.clear();
       updateCartUI();
-
       if (tg) tg.showAlert("Заказ отправлен ✅");
       else alert("Заказ отправлен ✅");
+
     } catch(e){
       alert("Сетевая ошибка: " + e);
       orderBtn.disabled = false;
