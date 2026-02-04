@@ -3,6 +3,10 @@
     {
       "source": "/api/order",
       "destination": "https://tg-miniapp-backend-production.up.railway.app/api/order"
+    },
+    {
+      "source": "/health",
+      "destination": "https://tg-miniapp-backend-production.up.railway.app/health"
     }
   ]
 }
