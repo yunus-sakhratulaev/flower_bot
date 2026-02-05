@@ -1,4 +1,3 @@
- 
 <!doctype html>
 <html lang="ru">
 <head>
@@ -41,7 +40,7 @@
       background:#111827;color:#fff;font-weight:700;display:flex;gap:8px;align-items:center;
     }
 
-    .container{max-width:1180px;margin:18px auto;padding:0 16px 120px}
+    .container{max-width:1180px;margin:18px auto;padding:0 16px 170px}
     .tabs{
       display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 16px;
     }
@@ -139,10 +138,10 @@
       position:fixed; left:0; right:0; bottom:0;
       background:#fff; border-top:1px solid var(--line);
       padding:12px 16px;
-      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
       z-index:20;
     }
-    .cartBarLeft{display:flex;flex-direction:column;gap:4px}
+    .cartBarLeft{display:flex;flex-direction:column;gap:6px; min-width: 220px;}
     .cartLine1{font-weight:900}
     .cartLine2{font-weight:1000;font-size:22px}
     .cartLine3{color:var(--muted);font-size:13px}
@@ -153,11 +152,38 @@
     .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
     .status{margin:12px 0 0;color:#0f172a;white-space:pre-wrap}
 
-    .backLink{
-      display:inline-flex;gap:8px;align-items:center;color:#111827;
-      font-weight:900;margin:8px 0 12px;
+    .addressWrap{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      flex: 1;
+      max-width: 520px;
     }
-    .backLink .arr{font-size:18px}
+    .addressLabel{font-weight:900;}
+    .addressInput{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:14px;
+      outline:none;
+    }
+    .smallRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .miniBtn{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      background:#fff;
+      cursor:pointer;
+      font-weight:900;
+      white-space:nowrap;
+    }
   </style>
 </head>
 
@@ -186,19 +212,31 @@
       <div class="cartLine1">Корзина: <span id="cartCount">0</span> шт.</div>
       <div class="cartLine2">Итого: <span id="cartTotal">0</span> ₽</div>
       <div class="cartLine3" id="buyerLine">Покупатель: ...</div>
+      <div class="cartLine3" id="deliveryLine">Доставка: 0 ₽</div>
     </div>
+
+    <div class="addressWrap">
+      <div class="addressLabel">Адрес доставки</div>
+      <input class="addressInput" id="addressInput" placeholder="Например: ул. Пушкина 10, подъезд 2" />
+      <div class="smallRow">
+        <button class="miniBtn" id="geoBtn" type="button">📍 Поделиться гео</button>
+        <div class="cartLine3" id="geoStatus">Гео: нет</div>
+      </div>
+    </div>
+
     <button class="orderBtn" id="orderBtn" disabled>Оформить заказ</button>
   </div>
 
 <script>
   // ========= НАСТРОЙКИ =========
   const API_URL = "https://tg-miniapp-backend-production.up.railway.app";
-  const API_KEY = "my_secret_key_123";
 
   // ========= Telegram =========
   const tg = window.Telegram?.WebApp;
   if (tg) { tg.ready(); tg.expand(); }
+
   const user = tg?.initDataUnsafe?.user || null;
+  const initData = tg?.initData || ""; // ВАЖНО: это подписанные данные Telegram
 
   const buyerText = user
     ? `Покупатель: ${user.first_name}${user.last_name ? " " + user.last_name : ""} (id ${user.id})`
@@ -255,11 +293,17 @@
 
   // ========= STATE =========
   const cart = new Map();     // productId -> qty
-  const delivery = new Map(); // productId -> slot
+  const deliverySlot = new Map(); // productId -> slot
   const app = document.getElementById("app");
   const cartCountEl = document.getElementById("cartCount");
   const cartTotalEl = document.getElementById("cartTotal");
   const orderBtn = document.getElementById("orderBtn");
+  const addressInput = document.getElementById("addressInput");
+  const deliveryLine = document.getElementById("deliveryLine");
+  const geoStatus = document.getElementById("geoStatus");
+
+  let geo = { lat: null, lng: null };
+  let lastDeliveryPrice = 0;
 
   function money(n){ return String(n); }
   function getQty(id){ return cart.get(id) || 0; }
@@ -281,8 +325,34 @@
   function updateCartUI(){
     const {count,total} = calcTotals();
     cartCountEl.textContent = count;
-    cartTotalEl.textContent = money(total);
+    cartTotalEl.textContent = money(total + lastDeliveryPrice);
     orderBtn.disabled = count === 0;
+    deliveryLine.textContent = `Доставка: ${money(lastDeliveryPrice)} ₽`;
+  }
+
+  async function refreshDeliveryQuote(){
+    // если гео нет — доставка 0 (пока). Можно потом сделать тариф по адресу.
+    if (!geo.lat || !geo.lng) {
+      lastDeliveryPrice = 0;
+      updateCartUI();
+      return;
+    }
+    try{
+      const r = await fetch(`${API_URL}/api/delivery/quote`, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ lat: geo.lat, lng: geo.lng })
+      });
+      const data = await r.json().catch(()=> ({}));
+      if (r.ok && data && typeof data.price === "number"){
+        lastDeliveryPrice = data.price;
+      } else {
+        lastDeliveryPrice = 0;
+      }
+    } catch(e){
+      lastDeliveryPrice = 0;
+    }
+    updateCartUI();
   }
 
   // ========= ROUTER (/#/product/1) =========
@@ -368,7 +438,7 @@
     const p = PRODUCTS.find(x=>x.id===id);
     if (!p){ go("/"); return; }
 
-    const slot = delivery.get(id) || "";
+    const slot = deliverySlot.get(id) || "";
 
     app.innerHTML = `
       <a class="backLink" href="javascript:void(0)" id="back"><span class="arr">←</span> Назад</a>
@@ -434,7 +504,7 @@
       b.className = "timeBtn" + (s===slot ? " active" : "");
       b.textContent = s;
       b.onclick = ()=>{
-        delivery.set(id, s);
+        deliverySlot.set(id, s);
         [...slots.children].forEach(ch=>ch.classList.remove("active"));
         b.classList.add("active");
       };
@@ -454,64 +524,62 @@
     };
   }
 
-  // ========= ORDER (ВАЖНО: теперь /api/order) =========
-  function buildOrderText(){
-    const lines = [];
-    lines.push("🛒 Новый заказ");
-
-    if (user){
-      const name = `${user.first_name}${user.last_name ? " " + user.last_name : ""}`;
-      lines.push(`👤 ${name}`);
-      lines.push(`🆔 ${user.id}`);
-      if (user.username) lines.push(`🔗 @${user.username}`);
-    } else {
-      lines.push("👤 Гость (не из Telegram)");
-    }
-
-    lines.push("");
-    lines.push("Состав заказа:");
-
-    let total = 0;
+  // ========= ORDER =========
+  function buildOrderItems(){
+    const items = [];
     for (const p of PRODUCTS){
       const q = getQty(p.id);
       if (q>0){
-        const sum = q*p.price;
-        total += sum;
-        const slot = delivery.get(p.id) || "не выбрано";
-        lines.push(`• ${p.title} — ${q} шт × ${p.price} ₽ = ${sum} ₽`);
-        lines.push(`  🕒 Доставка: ${slot}`);
+        items.push({
+          product_id: p.id,
+          title: p.title,
+          price: p.price,
+          qty: q
+        });
       }
     }
-    lines.push("");
-    lines.push(`ИТОГО: ${total} ₽`);
-    return lines.join("\n");
+    return items;
+  }
+
+  function getCommonSlot(){
+    // на старте упростим: берём слот первого товара, если выбран
+    for (const p of PRODUCTS){
+      const q = getQty(p.id);
+      if (q>0){
+        return deliverySlot.get(p.id) || null;
+      }
+    }
+    return null;
   }
 
   async function sendOrder(){
     const {count} = calcTotals();
     if (count === 0) return;
 
-    // buyer_id берём из Telegram
-    const buyerId = user?.id || 0;
-    if (!buyerId) {
+    if (!tg || !user || !initData) {
       alert("Открой mini-app внутри Telegram, чтобы оформить заказ.");
+      return;
+    }
+
+    const address = (addressInput.value || "").trim();
+    if (!address) {
+      alert("Введите адрес доставки.");
       return;
     }
 
     orderBtn.disabled = true;
 
-    const orderText = buildOrderText();
-
     try{
       const r = await fetch(`${API_URL}/api/order`, {
         method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          "X-API-Key": API_KEY
-        },
+        headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({
-          text: orderText,
-          buyer_id: buyerId
+          initData,
+          items: buildOrderItems(),
+          delivery_slot: getCommonSlot(),
+          address_text: address,
+          lat: geo.lat,
+          lng: geo.lng
         })
       });
 
@@ -522,14 +590,11 @@
         return;
       }
 
-      // очищаем корзину
       cart.clear();
-      delivery.clear();
+      deliverySlot.clear();
       updateCartUI();
 
-      if (tg) tg.showAlert("Заказ отправлен ✅");
-      else alert("Заказ отправлен ✅");
-
+      tg.showAlert(`Заказ отправлен ✅\nID: ${data.order_id}`);
       go("/");
     } catch(e){
       alert("Сетевая ошибка: " + e);
@@ -539,12 +604,35 @@
 
   orderBtn.onclick = sendOrder;
 
+  // ========= GEO button =========
+  document.getElementById("geoBtn").onclick = async ()=>{
+    if (!tg) { alert("Геолокация доступна только внутри Telegram."); return; }
+
+    // В разных версиях Telegram WebApp API может отличаться.
+    // Самый безопасный способ без ошибок: пробуем requestLocation, если есть.
+    if (typeof tg.requestLocation === "function") {
+      try{
+        tg.requestLocation((loc)=>{
+          if (!loc) return;
+          geo.lat = loc.latitude;
+          geo.lng = loc.longitude;
+          geoStatus.textContent = `Гео: ${geo.lat.toFixed(5)}, ${geo.lng.toFixed(5)}`;
+          refreshDeliveryQuote();
+        });
+      } catch(e){
+        alert("Не удалось запросить гео: " + e);
+      }
+    } else {
+      alert("В вашей версии Telegram WebApp нет requestLocation. Можно оформить по адресу.");
+    }
+  };
+
   // header handlers
   document.getElementById("goHome").onclick = ()=>go("/");
   document.getElementById("openCart").onclick = ()=>{
-    const {count} = calcTotals();
+    const {count,total} = calcTotals();
     if (count===0) alert("Корзина пустая");
-    else alert(buildOrderText());
+    else alert(`Товары: ${total} ₽\nДоставка: ${lastDeliveryPrice} ₽\nИтого: ${total + lastDeliveryPrice} ₽`);
   };
 
   window.addEventListener("hashchange", render);
