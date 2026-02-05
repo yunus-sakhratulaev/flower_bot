@@ -43,7 +43,7 @@
       overflow:hidden; box-shadow: var(--shadow);
       display:flex;flex-direction:column;min-height: 420px;
     }
-    .imgWrap{position:relative; height:240px; background:#eee; overflow:hidden; cursor:pointer}
+    .imgWrap{position:relative; height:240px; background:#eee; overflow:hidden}
     .imgWrap img{width:100%;height:100%;object-fit:cover;display:block}
     .badge{
       position:absolute; top:12px; right:12px;
@@ -52,7 +52,7 @@
       display:flex;gap:6px;align-items:center;
     }
     .cardBody{padding:14px 14px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
-    .title{font-weight:900;font-size:18px;margin:0;cursor:pointer}
+    .title{font-weight:900;font-size:18px;margin:0}
     .desc{margin:0;color:var(--muted);line-height:1.35}
     .bottomRow{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
     .price{font-weight:900;font-size:26px}
@@ -115,8 +115,8 @@
     </div>
 
     <div class="addressWrap">
-      <div class="addressLabel">Адрес доставки</div>
-      <input class="addressInput" id="addressInput" placeholder="Например: ул. Пушкина 10, подъезд 2" />
+      <div class="addressLabel">Адрес</div>
+      <input class="addressInput" id="addressInput" placeholder="ул. Пушкина 10, подъезд 2" />
     </div>
 
     <button class="orderBtn" id="orderBtn" disabled>Оформить заказ</button>
@@ -274,7 +274,7 @@
 
     const address = (addressInput.value || "").trim();
     if (!address) {
-      alert("Введите адрес доставки.");
+      alert("Введите адрес.");
       return;
     }
 
