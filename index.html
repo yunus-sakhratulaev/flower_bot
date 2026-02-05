@@ -24,7 +24,6 @@
     .brand{display:flex;gap:10px;align-items:center;font-weight:900;font-size:20px}
     .brand .ico{font-size:22px}
 
-    /* Build badge (очень заметно, чтобы понимать, что это тот билд) */
     .buildBadge{
       margin-left:auto;
       display:flex;align-items:center;gap:10px;flex-wrap:wrap;
@@ -104,24 +103,12 @@
     .cartLine2{font-weight:1000;font-size:22px}
     .cartLine3{color:var(--muted);font-size:13px}
 
-    .addressWrap{display:flex;flex-direction:column;gap:6px;flex:1;max-width:520px;}
-    .addressLabel{font-weight:900;}
-    .addressInput{
-      width:100%;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px 12px;
-      font-size:14px;
-      outline:none;
-    }
-
     .orderBtn{
       background:#16a34a;color:#fff;border:0;border-radius:16px;
       padding:14px 16px;font-weight:1000;cursor:pointer;min-width:190px;
     }
     .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
 
-    /* small debug line under the header */
     .debugRow{
       max-width:1180px;margin:10px auto 0;padding:0 16px;
       color:var(--muted);font-size:12px;
@@ -142,7 +129,6 @@
       <div>Магазин роз</div>
     </div>
 
-    <!-- СЧЕТЧИК / ВЕРСИЯ -->
     <div class="buildBadge" id="buildBadge">
       <span class="pill">🧩 build <code id="buildVersion">v1</code></span>
       <span class="small" id="buildTime">—</span>
@@ -153,9 +139,10 @@
     </div>
   </div>
 
-  <div class="debugRow" id="debugRow">
+  <div class="debugRow">
     <span>API:</span> <code id="apiUrlCode">—</code>
-    <span>initData:</span> <code id="initDataLen">—</code>
+    <span>initData len:</span> <code id="initDataLen">—</code>
+    <span>/health:</span> <code id="healthState">pending…</code>
   </div>
 
   <div class="container" id="app"></div>
@@ -167,37 +154,29 @@
       <div class="cartLine3" id="buyerLine">Покупатель: ...</div>
     </div>
 
-    <div class="addressWrap">
-      <div class="addressLabel">Адрес</div>
-      <input class="addressInput" id="addressInput" placeholder="ул. Пушкина 10, подъезд 2" />
-    </div>
-
     <button class="orderBtn" id="orderBtn" disabled>Оформить заказ</button>
   </div>
 
 <script>
   /**
-   * ВЕРСИЯ (меняй руками при каждом деплое)
-   * Чтобы точно понимать, что открылся нужный сайт и изменения применились.
+   * Меняй при каждом деплое, чтобы точно видеть что изменения применились.
    */
-  const BUILD_VERSION = "v11"; // <-- Увеличивай (v12, v13...)
-  // Чтобы видеть момент рендера даже если кеш — добавим timestamp загрузки
+  const BUILD_VERSION = "v20"; // <-- увеличивай: v21, v22...
   const BUILD_TIME = new Date().toLocaleString();
 
+  /**
+   * ВАЖНО: поставь тут ТВОЙ реальный Railway домен (как на скрине /health)
+   */
   const API_URL = "https://tg-miniapp-backend-production.up.railway.app";
 
-  // Telegram WebApp
   const tg = window.Telegram?.WebApp;
   if (tg) { tg.ready(); tg.expand(); }
 
   const user = tg?.initDataUnsafe?.user || null;
   const initData = tg?.initData || "";
 
-  // вывод build info
   document.getElementById("buildVersion").textContent = BUILD_VERSION;
   document.getElementById("buildTime").textContent = BUILD_TIME;
-
-  // debug row
   document.getElementById("apiUrlCode").textContent = API_URL;
   document.getElementById("initDataLen").textContent = String(initData.length);
 
@@ -241,7 +220,6 @@
   const cartCountEl = document.getElementById("cartCount");
   const cartTotalEl = document.getElementById("cartTotal");
   const orderBtn = document.getElementById("orderBtn");
-  const addressInput = document.getElementById("addressInput");
 
   let activeTab = "Все";
 
@@ -333,6 +311,21 @@
     return items;
   }
 
+  async function safeReadText(resp){
+    try { return await resp.text(); } catch { return ""; }
+  }
+
+  async function checkHealth(){
+    const el = document.getElementById("healthState");
+    try{
+      const r = await fetch(`${API_URL}/health`, { method: "GET" });
+      const t = await r.text();
+      el.textContent = `${r.status} ${t.slice(0, 60)}${t.length>60 ? "…" : ""}`;
+    } catch(e){
+      el.textContent = `ERR ${String(e)}`;
+    }
+  }
+
   async function sendOrder(){
     const {count} = calcTotals();
     if (count === 0) return;
@@ -342,37 +335,47 @@
       return;
     }
 
-    const address = (addressInput.value || "").trim();
-    if (!address) {
-      alert("Введите адрес.");
-      return;
-    }
-
     orderBtn.disabled = true;
+
+    // 1) сначала health-check (чтобы ловить CORS/сеть сразу)
+    await checkHealth();
 
     try{
       const r = await fetch(`${API_URL}/api/order`, {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           initData,
           items: buildOrderItems(),
-          address_text: address
+          address_text: null
         })
       });
 
-      const data = await r.json().catch(()=> ({}));
+      const raw = await safeReadText(r);
+      let data = {};
+      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { raw }; }
+
       if (!r.ok){
-        alert("Ошибка: " + JSON.stringify(data));
+        // покажем максимально понятно
+        alert(`Ошибка ${r.status}:\n${JSON.stringify(data)}`);
         orderBtn.disabled = false;
         return;
       }
 
       cart.clear();
       updateCartUI();
-      tg.showAlert(`Заказ отправлен ✅\nID: ${data.order_id}`);
+
+      if (tg?.showAlert) tg.showAlert(`Заказ отправлен ✅\nID: ${data.order_id || "?"}`);
+      else alert(`Заказ отправлен ✅\nID: ${data.order_id || "?"}`);
+
     } catch(e){
-      alert("Сетевая ошибка: " + e);
+      // Тут чаще всего CORS или недоступен домен API
+      alert(
+        "Сетевая ошибка (Failed to fetch).\n\n" +
+        "Это обычно CORS или API недоступен.\n" +
+        "Проверь /health в строке debug.\n\n" +
+        "Детали: " + String(e)
+      );
       orderBtn.disabled = false;
     }
   }
@@ -385,6 +388,7 @@
 
   updateCartUI();
   renderCatalog();
+  checkHealth();
 </script>
 </body>
 </html>
