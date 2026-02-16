@@ -1,394 +1,824 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Магазин роз</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>🌹 Магазин роз</title>
+
+  <!-- Telegram WebApp -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root{
-      --bg:#f6f7fb; --card:#ffffff; --text:#0f172a; --muted:#64748b;
-      --line:#e5e7eb; --green:#22c55e; --badge:#facc15;
-      --shadow: 0 10px 25px rgba(15,23,42,.08); --radius: 18px;
+      --bg: #0b0b10;
+      --card: rgba(255,255,255,0.06);
+      --card2: rgba(255,255,255,0.08);
+      --stroke: rgba(255,255,255,0.12);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.62);
+      --accent: #ff4d8d;
+      --accent2: #7c4dff;
+      --good: #23c55e;
+      --bad: #ff4d4d;
+
+      --radius: 18px;
+      --shadow: 0 16px 50px rgba(0,0,0,0.45);
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(255,77,141,0.35), transparent 55%),
+        radial-gradient(900px 520px at 105% 10%, rgba(124,77,255,0.30), transparent 55%),
+        radial-gradient(900px 520px at 30% 120%, rgba(35,197,94,0.16), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+      padding-bottom: 130px; /* место под bottom bar */
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 14px 0;
+    }
 
     .topbar{
-      height:64px;background:#fff;border-bottom:1px solid var(--line);
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 18px; position:sticky; top:0; z-index:10;
-      gap:12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 14px;
     }
-    .brand{display:flex;gap:10px;align-items:center;font-weight:900;font-size:20px}
-    .brand .ico{font-size:22px}
 
-    .buildBadge{
-      margin-left:auto;
-      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-      font-weight:900;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#fff;
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
     }
-    .buildBadge .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      background:rgba(34,197,94,.12);
-      border:1px solid rgba(34,197,94,.35);
-    }
-    .buildBadge code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px;
-      padding:2px 6px;border-radius:8px;background:#0f172a;color:#fff;
-    }
-    .buildBadge .small{font-weight:800;color:var(--muted);font-size:12px}
 
-    .rightIcons{display:flex;align-items:center;gap:12px}
-    .cartBtn{
-      width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
-      background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    .brand h1{
+      margin:0;
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: 0.2px;
     }
-    .cartBtn span{font-size:20px}
-
-    .container{max-width:1180px;margin:18px auto;padding:0 16px 170px}
-
-    .tabs{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 16px;}
-    .tab{
-      padding:10px 14px;border-radius:999px;border:1px solid var(--line);
-      background:#fff;cursor:pointer;font-weight:800;color:#111827;
-      display:flex;gap:8px;align-items:center;
+    .brand p{
+      margin:0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.2;
     }
-    .tab.active{background:var(--green);border-color:var(--green);color:#fff}
 
-    .grid{display:grid;gap:18px;grid-template-columns: repeat(3, 1fr);}
-    @media (max-width: 980px){ .grid{grid-template-columns: repeat(2, 1fr);} }
-    @media (max-width: 620px){ .grid{grid-template-columns: 1fr;} }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--stroke);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: 12px;
+      color: var(--muted);
+      user-select:none;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--good);
+      box-shadow: 0 0 0 4px rgba(35,197,94,0.15);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 760px){
+      .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+      .brand h1{ font-size: 24px; }
+      .brand p{ font-size: 13px; }
+    }
 
     .card{
-      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-      overflow:hidden; box-shadow: var(--shadow);
-      display:flex;flex-direction:column;min-height: 420px;
+      border-radius: var(--radius);
+      overflow:hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      border: 1px solid var(--stroke);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.30);
+      display:flex;
+      flex-direction:column;
+      min-height: 260px;
     }
-    .imgWrap{position:relative; height:240px; background:#eee; overflow:hidden}
-    .imgWrap img{width:100%;height:100%;object-fit:cover;display:block}
+
+    .imgWrap{
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: rgba(255,255,255,0.05);
+      overflow:hidden;
+    }
+    .imgWrap img{
+      width:100%; height:100%;
+      object-fit: cover;
+      display:block;
+      transform: scale(1.03);
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .imgFade{
+      position:absolute; inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.0) 35%, rgba(0,0,0,0.55) 100%);
+      pointer-events:none;
+    }
+
     .badge{
-      position:absolute; top:12px; right:12px;
-      background:rgba(250,204,21,.95);
-      padding:6px 10px;border-radius:999px;font-weight:900;font-size:13px;
-      display:flex;gap:6px;align-items:center;
-    }
-    .cardBody{padding:14px 14px 16px;display:flex;flex-direction:column;gap:10px;flex:1}
-    .title{font-weight:1000;font-size:18px;margin:0}
-    .desc{margin:0;color:var(--muted);line-height:1.35}
-    .bottomRow{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-    .price{font-weight:1000;font-size:26px}
-    .addBtn{
-      background:var(--green);color:#fff;border:0;border-radius:14px;
-      padding:12px 14px;font-weight:1000;cursor:pointer;white-space:nowrap;
+      position:absolute;
+      left: 10px;
+      top: 10px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.16);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: rgba(255,255,255,0.90);
     }
 
-    .cartBar{
-      position:fixed; left:0; right:0; bottom:0;
-      background:#fff; border-top:1px solid var(--line);
-      padding:12px 16px;
-      display:flex; justify-content:space-between; align-items:flex-end; gap:12px;
-      z-index:20;
-      flex-wrap:wrap;
+    .cardBody{
+      padding: 12px 12px 12px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      flex: 1;
     }
-    .cartBarLeft{display:flex;flex-direction:column;gap:6px; min-width: 220px;}
-    .cartLine1{font-weight:900}
-    .cartLine2{font-weight:1000;font-size:22px}
-    .cartLine3{color:var(--muted);font-size:13px}
 
-    .orderBtn{
-      background:#16a34a;color:#fff;border:0;border-radius:16px;
-      padding:14px 16px;font-weight:1000;cursor:pointer;min-width:190px;
+    .titleRow{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      align-items:flex-start;
     }
-    .orderBtn:disabled{background:#a7f3d0;color:#065f46;cursor:not-allowed}
 
-    .debugRow{
-      max-width:1180px;margin:10px auto 0;padding:0 16px;
-      color:var(--muted);font-size:12px;
-      display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+    .title{
+      font-size: 14.5px;
+      margin:0;
+      line-height: 1.2;
+      letter-spacing: 0.15px;
     }
-    .debugRow code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size:12px;
-      padding:2px 6px;border-radius:8px;background:#0f172a;color:#fff;
+    .desc{
+      margin:0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.25;
+    }
+    .price{
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.95);
+      white-space:nowrap;
+    }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:auto;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius: 14px;
+      padding: 11px 12px;
+      font-weight: 700;
+      font-size: 13px;
+      color: rgba(255,255,255,0.95);
+      background: linear-gradient(135deg, rgba(255,77,141,0.95), rgba(124,77,255,0.85));
+      box-shadow: 0 10px 30px rgba(255,77,141,0.18);
+      transition: transform .06s ease, filter .12s ease;
+      width: 100%;
+    }
+    .btn:active{ transform: translateY(1px); filter: brightness(0.95); }
+
+    .qty{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      padding: 8px;
+      min-width: 116px;
+      justify-content:space-between;
+    }
+    .qbtn{
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.20);
+      color: rgba(255,255,255,0.92);
+      cursor:pointer;
+      font-size: 16px;
+      line-height: 34px;
+      font-weight: 800;
+    }
+    .qbtn:active{ transform: translateY(1px); }
+
+    .qval{
+      font-weight: 800;
+      font-size: 13px;
+      color: rgba(255,255,255,0.92);
+      min-width: 20px;
+      text-align:center;
+    }
+
+    /* Bottom bar */
+    .bottomBar{
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(10,10,16,0.78);
+      border-top: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 50;
+    }
+    .bottomInner{
+      max-width: 980px;
+      margin: 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .sumBox{
+      display:flex;
+      flex-direction:column;
+      gap: 3px;
+      min-width: 140px;
+    }
+    .sumBox .small{
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .sumBox .big{
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+    .checkout{
+      min-width: 170px;
+      max-width: 420px;
+      flex: 1;
+    }
+    .checkout button{
+      width:100%;
+      border:none;
+      cursor:pointer;
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-weight: 900;
+      font-size: 14px;
+      color: rgba(255,255,255,0.96);
+      background: linear-gradient(135deg, rgba(35,197,94,0.95), rgba(255,77,141,0.88));
+      box-shadow: 0 14px 45px rgba(35,197,94,0.14);
+      transition: transform .06s ease, filter .12s ease;
+    }
+    .checkout button:disabled{
+      opacity: 0.45;
+      filter: grayscale(0.2);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .checkout button:active{ transform: translateY(1px); }
+
+    /* Modal */
+    .modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      padding: 14px;
+      z-index: 60;
+    }
+    .modal.show{ display:flex; }
+    .sheet{
+      width: min(980px, 100%);
+      max-height: 78vh;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 22px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display:flex;
+      flex-direction:column;
+    }
+    .sheetHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 12px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    .sheetHeader .h{
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+    .close{
+      border:none;
+      cursor:pointer;
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.9);
+      font-weight: 800;
+    }
+    .sheetBody{
+      padding: 12px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .cartItem{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+    .thumb{
+      width: 62px;
+      height: 52px;
+      border-radius: 14px;
+      overflow:hidden;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .ciMain{
+      flex: 1;
+      display:flex;
+      flex-direction:column;
+      gap: 3px;
+      min-width: 0;
+    }
+    .ciTitle{
+      font-weight: 900;
+      font-size: 13.5px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .ciMeta{
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+    .ciRight{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .ciSum{
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .notice{
+      margin-top: 6px;
+      color: rgba(255,255,255,0.72);
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 92px;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: rgba(255,255,255,0.92);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12.5px;
+      display:none;
+      z-index: 70;
+      max-width: calc(100% - 24px);
+      text-align:center;
+    }
+    .toast.show{ display:block; }
+
+    .smallLink{
+      color: rgba(255,255,255,0.75);
+      text-decoration: underline;
+      cursor:pointer;
+      font-weight: 700;
     }
   </style>
 </head>
 
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <div class="ico">🌹</div>
-      <div>Магазин роз</div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <h1>🌹 Магазин роз</h1>
+        <p>Быстро. Красиво. Подарок, который запомнят.</p>
+      </div>
+
+      <div class="pill" id="buildPill" title="Версия сборки (чтобы видеть, что обновления применились)">
+        <span class="dot"></span>
+        <span>Build: <b id="buildId">—</b></span>
+      </div>
     </div>
 
-    <div class="buildBadge" id="buildBadge">
-      <span class="pill">🧩 build <code id="buildVersion">v1</code></span>
-      <span class="small" id="buildTime">—</span>
+    <div class="pill" style="margin-bottom:12px;">
+      <span style="opacity:.9;">🛒</span>
+      <span>Нажми <b>+</b> чтобы добавить, открой корзину снизу — и оформи заказ</span>
+      <span style="margin-left:auto; color:rgba(255,255,255,0.8); font-weight:800;" id="cartBadge">0</span>
     </div>
 
-    <div class="rightIcons">
-      <button class="cartBtn" type="button" id="openCart" title="Корзина"><span>🛒</span></button>
+    <div class="grid" id="products"></div>
+
+    <div class="notice">
+      Оплата и подтверждение идут через бота. После оформления заказа админ пришлёт реквизиты, а ты отправишь чек.
     </div>
   </div>
 
-  <div class="debugRow">
-    <span>API:</span> <code id="apiUrlCode">—</code>
-    <span>initData len:</span> <code id="initDataLen">—</code>
-    <span>/health:</span> <code id="healthState">pending…</code>
-  </div>
+  <!-- Bottom Bar -->
+  <div class="bottomBar">
+    <div class="bottomInner">
+      <div class="sumBox">
+        <div class="small">Корзина: <b id="cartCount">0</b></div>
+        <div class="big"><span id="total">0</span> ₽</div>
+      </div>
 
-  <div class="container" id="app"></div>
-
-  <div class="cartBar">
-    <div class="cartBarLeft">
-      <div class="cartLine1">Корзина: <span id="cartCount">0</span> шт.</div>
-      <div class="cartLine2">Итого: <span id="cartTotal">0</span> ₽</div>
-      <div class="cartLine3" id="buyerLine">Покупатель: ...</div>
-    </div>
-
-    <button class="orderBtn" id="orderBtn" disabled>Оформить заказ</button>
-  </div>
-
-<script>
-  /**
-   * Меняй при каждом деплое, чтобы точно видеть что изменения применились.
-   */
-  const BUILD_VERSION = "v22"; // <-- увеличивай: v21, v22...
-  const BUILD_TIME = new Date().toLocaleString();
-
-  /**
-   * ВАЖНО: поставь тут ТВОЙ реальный Railway домен (как на скрине /health)
-   */
-  const API_URL = "https://tg-miniapp-backend-production.up.railway.app";
-
-  const tg = window.Telegram?.WebApp;
-  if (tg) { tg.ready(); tg.expand(); }
-
-  const user = tg?.initDataUnsafe?.user || null;
-  const initData = tg?.initData || "";
-
-  document.getElementById("buildVersion").textContent = BUILD_VERSION;
-  document.getElementById("buildTime").textContent = BUILD_TIME;
-  document.getElementById("apiUrlCode").textContent = API_URL;
-  document.getElementById("initDataLen").textContent = String(initData.length);
-
-  const buyerText = user
-    ? `Покупатель: ${user.first_name}${user.last_name ? " " + user.last_name : ""} (id ${user.id})`
-    : "Покупатель: Гость (не из Telegram)";
-  document.getElementById("buyerLine").textContent = buyerText;
-
-  const PRODUCTS = [
-    {
-      id: 1,
-      title: 'Красные розы "Классика"',
-      category: "Красные",
-      price: 3500,
-      popular: true,
-      desc: "Букет из 11 свежих красных роз — символ страсти и любви",
-      images: ["https://images.unsplash.com/photo-1548095115-45697e1bd1b3?auto=format&fit=crop&w=1200&q=80"]
-    },
-    {
-      id: 2,
-      title: 'Белые розы "Нежность"',
-      category: "Белые",
-      price: 3200,
-      popular: true,
-      desc: "Элегантный букет из белых роз для особенных моментов",
-      images: ["https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80"]
-    },
-    {
-      id: 3,
-      title: 'Розовые розы "Романтика"',
-      category: "Розовые",
-      price: 2900,
-      popular: true,
-      desc: "Нежный букет из розовых роз — идеален для свиданий",
-      images: ["https://images.unsplash.com/photo-1444392061186-0e23080c310a?auto=format&fit=crop&w=1200&q=80"]
-    }
-  ];
-
-  const cart = new Map(); // productId -> qty
-  const app = document.getElementById("app");
-  const cartCountEl = document.getElementById("cartCount");
-  const cartTotalEl = document.getElementById("cartTotal");
-  const orderBtn = document.getElementById("orderBtn");
-
-  let activeTab = "Все";
-
-  const tabs = [
-    {label:"Все", emoji:"🌹"},
-    {label:"Красные", emoji:"💖"},
-    {label:"Белые", emoji:"🤍"},
-    {label:"Розовые", emoji:"💗"},
-    {label:"Популярное", emoji:"⭐"}
-  ];
-
-  function money(n){ return String(n); }
-  function getQty(id){ return cart.get(id) || 0; }
-  function setQty(id, qty){
-    if (qty <= 0) cart.delete(id);
-    else cart.set(id, qty);
-    updateCartUI();
-  }
-
-  function filteredProducts(){
-    if (activeTab === "Все") return PRODUCTS;
-    if (activeTab === "Популярное") return PRODUCTS.filter(p=>p.popular);
-    return PRODUCTS.filter(p=>p.category===activeTab);
-  }
-
-  function calcTotals(){
-    let count = 0, total = 0;
-    for (const p of PRODUCTS){
-      const q = getQty(p.id);
-      if (q>0){ count += q; total += q*p.price; }
-    }
-    return {count,total};
-  }
-
-  function updateCartUI(){
-    const {count,total} = calcTotals();
-    cartCountEl.textContent = count;
-    cartTotalEl.textContent = money(total);
-    orderBtn.disabled = count === 0;
-  }
-
-  function renderCatalog(){
-    const items = filteredProducts();
-    app.innerHTML = `<div class="tabs" id="tabs"></div><div class="grid" id="grid"></div>`;
-
-    const tabsEl = document.getElementById("tabs");
-    tabs.forEach(t=>{
-      const b = document.createElement("button");
-      b.className = "tab" + (t.label===activeTab ? " active" : "");
-      b.innerHTML = `<span>${t.emoji}</span> ${t.label}`;
-      b.onclick = ()=>{ activeTab = t.label; renderCatalog(); };
-      tabsEl.appendChild(b);
-    });
-
-    const grid = document.getElementById("grid");
-    items.forEach(p=>{
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="imgWrap">
-          <img src="${p.images[0]}" alt="">
-          ${p.popular ? `<div class="badge">⭐ Популярное</div>` : ""}
+      <div class="checkout">
+        <button id="checkoutBtn" onclick="checkout()" disabled>
+          ✅ Оформить заказ
+        </button>
+        <div class="notice" style="margin:6px 4px 0;">
+          <span class="smallLink" onclick="openCart()">Открыть корзину</span>
         </div>
-        <div class="cardBody">
-          <p class="title">${p.title}</p>
-          <p class="desc">${p.desc}</p>
-          <div class="bottomRow">
-            <div class="price">${money(p.price)} ₽</div>
-            <button class="addBtn">+ В корзину</button>
-          </div>
-        </div>
-      `;
-      card.querySelector(".addBtn").onclick = (e)=>{
-        e.stopPropagation();
-        setQty(p.id, getQty(p.id)+1);
-      };
-      grid.appendChild(card);
-    });
-  }
+      </div>
+    </div>
+  </div>
 
-  function buildOrderItems(){
-    const items = [];
-    for (const p of PRODUCTS){
-      const q = getQty(p.id);
-      if (q>0){
-        items.push({ product_id: p.id, title: p.title, price: p.price, qty: q });
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal" onclick="backdropClose(event)">
+    <div class="sheet">
+      <div class="sheetHeader">
+        <div class="h">🧺 Корзина</div>
+        <button class="close" onclick="closeCart()">Закрыть</button>
+      </div>
+      <div class="sheetBody" id="cartBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========= CONFIG =========
+    // НЕ ЛОМАЕМ СВЯЗАННОСТЬ: API URL тот же, /api/order тот же, initData тот же
+    const API_URL = "https://tg-miniapp-backend-production.up.railway.app";
+
+    // Build marker: меняй число, чтобы видеть обновление на Vercel
+    const BUILD_ID = "2026-02-17.1";
+
+    // Telegram init
+    const tg = window.Telegram?.WebApp;
+    try { tg?.ready(); tg?.expand(); } catch (e) {}
+
+    document.getElementById("buildId").innerText = BUILD_ID;
+
+    // ========= PRODUCTS =========
+    // Фото: стабильные ссылки (Unsplash source). Можно потом заменить на свои.
+    const products = [
+      {
+        id: 1,
+        title: "Букет красных роз",
+        price: 3500,
+        badge: "Хит",
+        desc: "Классика, которая всегда уместна.",
+        image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: 2,
+        title: "Букет белых роз",
+        price: 3200,
+        badge: "Нежность",
+        desc: "Лёгкость и чистота в каждом лепестке.",
+        image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: 3,
+        title: "Букет розовых роз",
+        price: 2900,
+        badge: "Романтика",
+        desc: "Тёплые эмоции и мягкие оттенки.",
+        image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: 4,
+        title: "Премиум микс",
+        price: 4900,
+        badge: "Премиум",
+        desc: "Сборный букет: вау-эффект гарантирован.",
+        image: "https://images.unsplash.com/photo-1548095115-45697e4a1e43?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: 5,
+        title: "Мини букет",
+        price: 1900,
+        badge: "Лаконично",
+        desc: "Небольшой подарок — большие чувства.",
+        image: "https://images.unsplash.com/photo-1496062031456-07b8f162a322?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: 6,
+        title: "Букет для особого случая",
+        price: 5400,
+        badge: "Событие",
+        desc: "Для дней, которые хочется запомнить.",
+        image: "https://images.unsplash.com/photo-1526040652367-ac003a0475fe?auto=format&fit=crop&w=1200&q=80"
+      },
+    ];
+
+    // ========= STATE =========
+    // cart: [{id,title,price,qty,image}]
+    let cart = [];
+
+    // ========= UI HELPERS =========
+    function rub(n){
+      return (n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    function toast(msg){
+      const el = document.getElementById("toast");
+      el.innerText = msg;
+      el.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=> el.classList.remove("show"), 1800);
+    }
+
+    function getQty(id){
+      const it = cart.find(x => x.id === id);
+      return it ? it.qty : 0;
+    }
+
+    function setQty(id, qty){
+      qty = Math.max(0, qty|0);
+      const p = products.find(x => x.id === id);
+      if(!p) return;
+
+      const existing = cart.find(x => x.id === id);
+      if(qty === 0){
+        cart = cart.filter(x => x.id !== id);
+      } else if(existing){
+        existing.qty = qty;
+      } else {
+        cart.push({ id: p.id, title: p.title, price: p.price, qty, image: p.image });
       }
-    }
-    return items;
-  }
-
-  async function safeReadText(resp){
-    try { return await resp.text(); } catch { return ""; }
-  }
-
-  async function checkHealth(){
-    const el = document.getElementById("healthState");
-    try{
-      const r = await fetch(`${API_URL}/health`, { method: "GET" });
-      const t = await r.text();
-      el.textContent = `${r.status} ${t.slice(0, 60)}${t.length>60 ? "…" : ""}`;
-    } catch(e){
-      el.textContent = `ERR ${String(e)}`;
-    }
-  }
-
-  async function sendOrder(){
-    const {count} = calcTotals();
-    if (count === 0) return;
-
-    if (!tg || !user || !initData) {
-      alert("Открой mini-app внутри Telegram, чтобы оформить заказ.");
-      return;
+      update();
+      renderProducts(); // обновить qty в карточках
     }
 
-    orderBtn.disabled = true;
+    function inc(id){ setQty(id, getQty(id) + 1); }
+    function dec(id){ setQty(id, getQty(id) - 1); }
 
-    // 1) сначала health-check (чтобы ловить CORS/сеть сразу)
-    await checkHealth();
+    // ========= RENDER =========
+    function renderProducts(){
+      const el = document.getElementById("products");
+      el.innerHTML = "";
 
-    try{
-      const r = await fetch(`${API_URL}/api/order`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          initData,
-          items: buildOrderItems(),
-          address_text: null
-        })
+      products.forEach(p=>{
+        const qty = getQty(p.id);
+
+        el.insertAdjacentHTML("beforeend", `
+          <div class="card">
+            <div class="imgWrap">
+              <img src="${p.image}" alt="${escapeHtml(p.title)}" loading="lazy" />
+              <div class="imgFade"></div>
+              <div class="badge">${escapeHtml(p.badge)}</div>
+            </div>
+
+            <div class="cardBody">
+              <div class="titleRow">
+                <div style="min-width:0;">
+                  <h3 class="title">${escapeHtml(p.title)}</h3>
+                  <p class="desc">${escapeHtml(p.desc)}</p>
+                </div>
+                <div class="price">${rub(p.price)} ₽</div>
+              </div>
+
+              <div class="actions">
+                <div class="qty" aria-label="Количество">
+                  <button class="qbtn" onclick="dec(${p.id})">−</button>
+                  <div class="qval" id="q_${p.id}">${qty}</div>
+                  <button class="qbtn" onclick="inc(${p.id})">+</button>
+                </div>
+
+                <div style="flex:1;">
+                  <button class="btn" onclick="inc(${p.id})">
+                    Добавить
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `);
       });
+    }
 
-      const raw = await safeReadText(r);
-      let data = {};
-      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { raw }; }
-
-      if (!r.ok){
-        // покажем максимально понятно
-        alert(`Ошибка ${r.status}:\n${JSON.stringify(data)}`);
-        orderBtn.disabled = false;
+    function renderCart(){
+      const body = document.getElementById("cartBody");
+      if(cart.length === 0){
+        body.innerHTML = `
+          <div class="cartItem" style="justify-content:space-between;">
+            <div class="ciMain">
+              <div class="ciTitle">Корзина пуста</div>
+              <div class="ciMeta">Добавь товары в каталоге</div>
+            </div>
+            <div class="ciRight">
+              <div class="ciSum">0 ₽</div>
+            </div>
+          </div>
+        `;
         return;
       }
 
-      cart.clear();
-      updateCartUI();
+      body.innerHTML = "";
+      cart.forEach(it=>{
+        body.insertAdjacentHTML("beforeend", `
+          <div class="cartItem">
+            <div class="thumb"><img src="${it.image}" alt="" loading="lazy" /></div>
+            <div class="ciMain">
+              <div class="ciTitle">${escapeHtml(it.title)}</div>
+              <div class="ciMeta">
+                <span>${rub(it.price)} ₽ / шт</span>
+                <span>× ${it.qty}</span>
+              </div>
+            </div>
+            <div class="ciRight">
+              <div class="ciSum">${rub(it.price * it.qty)} ₽</div>
+              <div class="qty">
+                <button class="qbtn" onclick="dec(${it.id}); renderCart();">−</button>
+                <div class="qval">${it.qty}</div>
+                <button class="qbtn" onclick="inc(${it.id}); renderCart();">+</button>
+              </div>
+            </div>
+          </div>
+        `);
+      });
 
-      if (tg?.showAlert) tg.showAlert(`Заказ отправлен ✅\nID: ${data.order_id || "?"}`);
-      else alert(`Заказ отправлен ✅\nID: ${data.order_id || "?"}`);
-
-    } catch(e){
-      // Тут чаще всего CORS или недоступен домен API
-      alert(
-        "Сетевая ошибка (Failed to fetch).\n\n" +
-        "Это обычно CORS или API недоступен.\n" +
-        "Проверь /health в строке debug.\n\n" +
-        "Детали: " + String(e)
-      );
-      orderBtn.disabled = false;
+      body.insertAdjacentHTML("beforeend", `
+        <div class="cartItem" style="justify-content:space-between;">
+          <div class="ciMain">
+            <div class="ciTitle">Итого</div>
+            <div class="ciMeta">Оформление отправит заказ админу</div>
+          </div>
+          <div class="ciRight">
+            <div class="ciSum">${rub(calcTotal())} ₽</div>
+          </div>
+        </div>
+      `);
     }
-  }
 
-  document.getElementById("openCart").onclick = ()=>{
-    const {count,total} = calcTotals();
-    alert(count===0 ? "Корзина пустая" : `Товаров: ${count}\nСумма: ${total} ₽`);
-  };
-  orderBtn.onclick = sendOrder;
+    function update(){
+      const total = calcTotal();
+      const count = cart.reduce((a,b)=>a + b.qty, 0);
 
-  updateCartUI();
-  renderCatalog();
-  checkHealth();
-</script>
+      document.getElementById("total").innerText = rub(total);
+      document.getElementById("cartCount").innerText = count;
+      document.getElementById("cartBadge").innerText = count;
+
+      const btn = document.getElementById("checkoutBtn");
+      btn.disabled = cart.length === 0;
+      btn.innerText = cart.length === 0 ? "✅ Оформить заказ" : `✅ Оформить заказ · ${rub(total)} ₽`;
+    }
+
+    function calcTotal(){
+      return cart.reduce((a,b)=>a + (b.price*b.qty), 0);
+    }
+
+    function openCart(){
+      renderCart();
+      document.getElementById("cartModal").classList.add("show");
+    }
+    function closeCart(){
+      document.getElementById("cartModal").classList.remove("show");
+    }
+    function backdropClose(e){
+      if(e.target && e.target.id === "cartModal") closeCart();
+    }
+
+    function escapeHtml(s){
+      return (s ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ========= CHECKOUT =========
+    async function checkout(){
+      if(cart.length === 0){ toast("Корзина пуста"); return; }
+
+      // Telegram initData
+      const initData = tg?.initData || "";
+
+      if(!initData){
+        // На десктопе/в браузере без Telegram может быть пусто
+        toast("Открой miniapp внутри Telegram");
+        return;
+      }
+
+      const items = cart.map(i => ({
+        product_id: i.id,
+        title: i.title,
+        price: i.price,
+        qty: i.qty
+      }));
+
+      const btn = document.getElementById("checkoutBtn");
+      btn.disabled = true;
+      const oldText = btn.innerText;
+      btn.innerText = "⏳ Отправляю заказ…";
+
+      try{
+        const res = await fetch(API_URL + "/api/order", {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify({ initData, items })
+        });
+
+        const data = await res.json().catch(()=> ({}));
+
+        if(res.ok && data.order_id){
+          toast("✅ Заказ создан! Жди реквизиты в боте.");
+          cart = [];
+          update();
+          renderProducts();
+          closeCart();
+        }else{
+          console.log("checkout error:", res.status, data);
+          toast("❌ Ошибка заказа. Проверь и попробуй ещё раз.");
+        }
+      }catch(e){
+        console.log(e);
+        toast("❌ Нет связи с сервером");
+      }finally{
+        btn.disabled = cart.length === 0;
+        btn.innerText = cart.length === 0 ? "✅ Оформить заказ" : oldText;
+        update();
+      }
+    }
+
+    // ========= INIT =========
+    renderProducts();
+    update();
+
+    // Telegram MainButton (не ломает ничего, просто удобство)
+    try{
+      if(tg){
+        tg.MainButton.setText("Открыть корзину");
+        tg.MainButton.onClick(openCart);
+        tg.MainButton.show();
+      }
+    }catch(e){}
+  </script>
 </body>
 </html>
